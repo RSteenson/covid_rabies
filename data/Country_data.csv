@@ -1,0 +1,54 @@
+COUNTRY,POPULATION (thousands),COUNTRY RELATIVE WEIGHT,NUMBER OF RESPONSES,COUNTRY X RESPONSES WEIGHT,COUNTRIES SQUEEZED TO 1,CANINE RABIES FREE,SARE 2015,SARE 2016,SARE 2017,SARE 2018,SARE 2019,SARE 2020,SCORE OF LATEST SARE,HUMAN RABIES DEATHS (Hampson 2015),% DOG VACCINATION COVERAGE,ANNUAL COST OF RABIES (usd),PEP TREATMENTS,RABIES STATUS,TOP 5 PRIORITY,NOTIFIABLE IN HUMANS,NOTIFIABLE IN ANIMALS,NATIONAL STRATEGY,OH/RABIES TASKFORCE
+Afghanistan,"38,928",0.002999,1,0.002999,no,no,0,0,0,0,0,0,NA,"1,768",1,"68,398,212","71,710",endemic,NA,NA,NA,NA,NA
+Global_1,"1,938,968",0.14936,1,0.14936,no,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Global_2,"1,938,968",0.14936,1,0.14936,no,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Global_3,"1,938,968",0.14936,1,0.14936,no,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Global_4,"1,938,968",0.14936,1,0.14936,no,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+Argentina,"45,196",0.003481,1,0.003481,no,no,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+Brazil,"212,559",0.016374,1,0.016374,no,no,NA,NA,NA,NA,NA,NA,NA,16,69, NA ,"427,604",NA,NA,NA,NA,NA,NA
+Brunei Darussalam,437,0.000034,2,0.000067,no,no,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+Burkina Faso,"20,903",0.00161,1,0.00161,no,no,1,0,0,0,0,0,NA,880,1,"44,240,730","14,582",endemic,NA,NA,NA,NA,NA
+Haiti,"11,403",0.000878,1,0.000878,no,no,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+Israel,"8,656",0.000667,1,0.000667,no,no,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+Kuwait,"4,271",0.000329,1,0.000329,no,no,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+Libya,"6,871",0.000529,1,0.000529,no,no,0,0,0,0,0,0,NA,2,24,"6,208,614","12,772",endemic,NA,NA,NA,NA,NA
+Mali,"20,251",0.00156,1,0.00156,no,no,1,0,0,1,0,0,NA,248,1,"20,146,173","5,958",endemic,NA,yes,yes,no,yes
+Morocco,"36,911",0.002843,1,0.002843,no,no,0,0,0,0,0,0,NA,80,14,"26,834,246","49,243",endemic,NA,NA,NA,NA,NA
+Peru,"32,972",0.00254,1,0.00254,no,no,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+Saudi Arabia,"34,814",0.002682,1,0.002682,no,no,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+South Sudan,"11,194",0.000862,1,0.000862,no,no,0,0,0,0,0,0,NA,204,0,"93,480,109","9,290",endemic,NA,NA,NA,NA,NA
+Sweden,"10,099",0.000778,1,0.000778,no,no,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+Yemen,"29,826",0.002298,1,0.002298,no,no,0,0,0,0,0,0,NA,148,18,"17,110,158","20,340",endemic,NA,NA,NA,NA,NA
+Canada,"37,742",0.002907,1,0.002907,no,yes,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+Singapore,"5,850",0.000451,1,0.000451,no,yes,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+Taiwan Province of China,"23,817",0.001835,13,0.02385,yes,yes,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+United States of America,"331,003",0.025497,2,0.050995,no,yes,NA,NA,NA,NA,NA,NA,NA, NA ,NA, NA , NA ,NA,NA,NA,NA,NA,NA
+Bhutan,772,0.000059,5,0.000297,yes,no,0,0,1,1,1,0,3.5,13,10,"2,216,381","3,307",controlled,yes,yes,yes,yes,yes
+Philippines,"109,581",0.008441,3,0.025323,no,no,0,0,0,1,0,0,3.5,168,10,"42,853,291","215,171",endemic,yes,yes,yes,yes,yes
+ThailaNA,"69,800",0.005377,2,0.010753,no,no,0,0,0,1,0,0,3.5,62,50,"72,189,160","398,377",endemic,yes,yes,yes,yes,yes
+Bangladesh,"164,689",0.012686,4,0.050745,no,no,0,0,0,1,1,0,2.5,933,5,"74,259,909","159,288",endemic,yes,yes,yes,yes,yes
+Cambodia,"16,719",0.001288,1,0.001288,no,no,0,0,0,1,0,0,2.5,446,1,"34,889,308","94,662",endemic,yes,yes,yes,yes,yes
+Eswatini,"1,160",0.000089,1,0.000089,no,no,1,1,1,1,0,0,2.5,8,1,"2,469,559","1,733",endemic,yes,yes,yes,yes,yes
+INAonesia,"273,524",0.02107,1,0.02107,no,no,0,0,0,1,0,0,2.5,197,24,"78,176,489","242,725",endemic,yes,yes,yes,yes,yes
+Namibia,"2,541",0.000196,2,0.000391,no,no,1,0,1,1,0,0,2.5,4,1,"5,111,282","3,277",endemic,yes,yes,yes,yes,yes
+South Africa,"59,309",0.004569,1,0.004569,no,no,1,0,1,1,0,0,2.5,42,63,"66,814,014","211,591",endemic,yes,yes,yes,in progress,yes
+Côte d'Ivoire,"26,378",0.002032,4,0.008128,no,no,1,1,0,1,0,0,2,569,1,"40,994,178","23,605",endemic,yes,yes,yes,yes,yes
+Botswana,"2,352",0.000181,1,0.000181,no,no,1,0,1,1,0,0,1.5,3,1,"4,959,823","  2,931 ",endemic,yes,no,yes,no,yes
+China,"1,439,324",0.110872,2,0.221744,no,no,0,0,0,0,1,0,1.5,"6,002",14," 3,192,741,307  ","14,943,066",endemic,NA,NA,NA,yes,NA
+Gabon,"2,226",0.000171,1,0.000171,no,no,0,1,0,1,0,1,1.5,1,1,"1,561,809","1,992",endemic,NA,yes,yes,no,no
+Ghana,"31,073",0.002394,2,0.004787,no,no,1,1,1,1,0,0,1.5,112,1,"16,013,648","30,434",endemic,yes,yes,yes,in progress,no
+INAia,"1,380,004",0.106303,10,1.063027,no,no,0,0,0,1,1,0,1.5,"20,847",15," 2,390,332,273  ","8,209,470",endemic,yes,no,yes,in progress,no
+Malawi,"19,130",0.001474,1,0.001474,no,no,1,0,1,1,1,0,1.5,484,1,"13,323,302","19,971",endemic,no,yes,yes,in progress,yes
+Mozambique,"31,255",0.002408,1,0.002408,no,no,1,1,1,1,0,0,1.5,"1,326",10,"41,809,281","23,480",endemic,NA,yes,yes,no,yes
+Nigeria,"206,140",0.015879,5,0.079395,no,no,1,1,1,1,0,0,1.5,"1,637",12,"189,008,678","188,317",endemic,NA,yes,yes,no,no
+Pakistan,"220,892",0.017015,3,0.051046,no,no,0,0,0,1,0,0,1.5,448,5,"68,139,347","80,561",endemic,yes,no,yes,no,no
+Sri Lanka,"21,413",0.001649,2,0.003299,no,no,0,0,0,1,1,0,1.5,35,49,"21,122,199","249,094",endemic,yes,yes,yes,in progress,no
+"Tanzania, United Republic of ","59,734",0.004601,3,0.013804,no,no,1,0,1,1,0,0,1.5,345,1,"35,210,029","34,240",endemic,yes,yes,yes,in progress,no
+Kenya,"53,771",0.004142,2,0.008284,no,no,1,0,1,1,0,0,0.5,523,1,"54,490,080","91,883",endemic,yes,yes,yes,yes,yes
+Lao People's Democratic Republic,"7,276",0.00056,1,0.00056,no,no,0,0,0,1,0,0,0.5,38,1,"5,037,005","8,253",endemic,yes,yes,yes,yes,yes
+Nepal,"29,137",0.002244,3,0.006733,no,no,0,0,0,0,1,0,0.5,"1,044",0,"54,849,922","92,585",endemic,no,no,yes,yes,no
+UgaNAa,"45,741",0.003523,1,0.003523,no,no,1,0,1,1,0,0,0.5,133,10,"9,177,859","12,234",endemic,NA,yes,yes,no,yes
+Zambia,"18,384",0.001416,1,0.001416,no,no,1,0,1,1,0,0,0.5,48,20,"5,539,741","4,479",endemic,yes,yes,yes,yes,yes
+Guinea-Bissau,"1,968",0.000152,1,0.000152,no,no,0,1,0,0,0,0,0,72,1,"3,059,767","1,594",endemic,NA,NA,NA,NA,NA
+Sierra Leone,"7,977",0.000614,1,0.000614,no,no,0,1,1,1,0,0,0,301,1,"7,274,306","5,329",endemic,yes,yes,yes,yes,yes
+,,,103,,,,,,,,,,,,,,,,,,,,
