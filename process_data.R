@@ -54,6 +54,23 @@ map.world <- map.world[-which(map.world$region=="Antarctica"),]
 map.world$region <- trimws(map.world$region, which="right")
 survey_data$country <- trimws(survey_data$country, which="right")
 
+# Recode names to match between data
+country_data$COUNTRY[which(country_data$COUNTRY=="Brunei Darussalam")] <- "Brunei"
+country_data$COUNTRY[which(country_data$COUNTRY=="Guinea-Bissau")] <- "Guinea Bissau"
+country_data$COUNTRY[which(country_data$COUNTRY=="INAia")] <- "India"
+country_data$COUNTRY[which(country_data$COUNTRY=="INAonesia")] <- "Indonesia"
+country_data$COUNTRY[which(country_data$COUNTRY=="Lao People's Democratic Republic")] <- "Laos"
+country_data$COUNTRY[which(country_data$COUNTRY=="Taiwan Province of China")] <- "Taiwan"
+country_data$COUNTRY[which(country_data$COUNTRY=="Tanzania, United Republic of ")] <- "Tanzania"
+country_data$COUNTRY[which(country_data$COUNTRY=="ThailaNA")] <- "Thailand"
+country_data$COUNTRY[which(country_data$COUNTRY=="UgaNAa")] <- "Uganda"
+country_data$COUNTRY[which(country_data$COUNTRY=="United States of America")] <- "USA"
+
+# Recode countries to read as "endemic"
+country_data$RABIES.STATUS[which(country_data$COUNTRY=="Argentina")] <- "endemic"
+country_data$RABIES.STATUS[which(country_data$COUNTRY=="Brazil")] <- "endemic"
+country_data$RABIES.STATUS[which(country_data$COUNTRY=="Peru")] <- "endemic"
+
 # Create dataframe of countries and endemic status
 country_df <- survey_data %>%
   dplyr::select(country) %>%
@@ -68,7 +85,7 @@ country_df$RABIES.STATUS = factor(country_df$RABIES.STATUS, levels=c("Endemic", 
 survey_data = merge(survey_data, country_df, by="country")
 
 # Recode shapefile to match data
-country_df$country[which(country_df$country=="C??te d'Ivoire")] <- "Ivory Coast"
+country_df$country[grepl("d'Ivoire", country_df$country)] <- "Ivory Coast"
 map.world$region[which(map.world$region=="Guinea-Bissau")] <- "Guinea Bissau"
 map.world$region[which(map.world$region=="Swaziland")] <- "Eswatini"
 map.world$region[which(map.world$region=="South Africa" & map.world$subregion=="enclave")] <- "Lesotho"
