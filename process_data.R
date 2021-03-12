@@ -4,6 +4,7 @@ rm(list=ls())
 library(dplyr)
 library(sf)
 library(ggplot2)
+library(tidyverse)
 
 options(stringsAsFactors=FALSE,
         dplyr.summarise.inform = FALSE)
@@ -34,8 +35,9 @@ survey_data = read.csv("data/Survey_data.csv")
 # Load shapefile
 map.world <- map_data("world")
 
-# Create colour palette
+# Create colour and alpha palette
 col_pal = c("Endemic"="firebrick2", "Controlled"="#E69F00", "Not endemic"="#0072B2")
+alph_pal = c("positive"=1, "negative"=0.1)
 
 # 1.  A map of countries with responses to the survey (perhaps coloured by those
 #     with endemic dog rabies or not - can always use Gavi data on this)
@@ -138,7 +140,7 @@ mdv_happened_2020$question = factor(mdv_happened_2020$question,
 # Summarise data for statistics
 mdv_happened_2020_summary = mdv_happened_2020 %>%
   filter(question != "NA1") %>%
-  mutate(q_n = 1) %>%
+  mutate(q_n = "1") %>%
   group_by(q_n, n_surveys, n_NAs, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
@@ -148,16 +150,19 @@ mdv_happened_2020_plot = mdv_happened_2020 %>%
   filter(question != "NA1") %>%
   group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
   tally() %>%
-  mutate(p = round((n/n_surveys)*100, digits=1))
+  mutate(p = round((n/n_surveys)*100, digits=1),
+         result = ifelse(question=="yes.as.planned", "positive", "negative"))
 
 # Produce barplot
-ggplot(data=mdv_happened_2020_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
+ggplot(data=mdv_happened_2020_plot, aes(x=question, y=p, fill=RABIES.STATUS, color=RABIES.STATUS, alpha=result)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="In 2020, was MDV carried out?",
        subtitle=paste0("Responded: ", unique(mdv_happened_2020_plot$n_surveys),
                        "; No answer: ", unique(mdv_happened_2020_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
   scale_fill_manual(values=col_pal) +
+  scale_color_manual(values=col_pal) +
+  scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
 ggsave("figs/q1_mdv_carried_out.pdf", height=7, width=8)
@@ -190,7 +195,7 @@ cause_mdv_interuption$question = factor(cause_mdv_interuption$question,
 # Summarise data for statistics
 cause_mdv_interuption_summary = cause_mdv_interuption %>%
   filter(question != "NA2") %>%
-  mutate(q_n = 2) %>%
+  mutate(q_n = "2") %>%
   group_by(q_n, n_surveys, n_NAs, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
@@ -236,7 +241,7 @@ mdv_method$question = factor(mdv_method$question,
 # Summarise data for statistics
 mdv_method_summary = mdv_method %>%
   filter(question != "NA3") %>%
-  mutate(q_n = 3) %>%
+  mutate(q_n = "3") %>%
   group_by(q_n, n_surveys, n_NAs, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
@@ -284,7 +289,7 @@ impact_on_vaccine$question = factor(impact_on_vaccine$question,
 # Summarise data for statistics
 impact_on_vaccine_summary = impact_on_vaccine %>%
   filter(question != "NA4") %>%
-  mutate(q_n = 4) %>%
+  mutate(q_n = "4") %>%
   group_by(q_n, n_surveys, n_NAs, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
@@ -294,16 +299,19 @@ impact_on_vaccine_plot = impact_on_vaccine %>%
   filter(question != "NA4") %>%
   group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
   tally() %>%
-  mutate(p = round((n/n_surveys)*100, digits=1))
+  mutate(p = round((n/n_surveys)*100, digits=1),
+         result = ifelse(question=="none1", "positive", "negative"))
 
 # Produce barplot
-ggplot(data=impact_on_vaccine_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
+ggplot(data=impact_on_vaccine_plot, aes(x=question, y=p, fill=RABIES.STATUS, color=RABIES.STATUS, alpha=result)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What has been the impact on vaccine production/supply chains?",
        subtitle=paste0("Responded: ", unique(impact_on_vaccine_plot$n_surveys),
                        "; No answer: ", unique(impact_on_vaccine_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
   scale_fill_manual(values=col_pal) +
+  scale_color_manual(values=col_pal) +
+  scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
 ggsave("figs/q4_impact_on_vaccine.pdf", height=7, width=8)
@@ -330,7 +338,7 @@ change_in_dog$question = factor(change_in_dog$question,
 # Summarise data for statistics
 change_in_dog_summary = change_in_dog %>%
   filter(question != "NA5") %>%
-  mutate(q_n = 5) %>%
+  mutate(q_n = "5") %>%
   group_by(q_n, n_surveys, n_NAs, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
@@ -340,16 +348,19 @@ change_in_dog_plot = change_in_dog %>%
   filter(question != "NA5") %>%
   group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
   tally() %>%
-  mutate(p = round((n/n_surveys)*100, digits=1))
+  mutate(p = round((n/n_surveys)*100, digits=1),
+         result = ifelse(question=="fewer.roaming.dogs", "positive", "negative"))
 
 # Produce barplot
-ggplot(data=change_in_dog_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
+ggplot(data=change_in_dog_plot, aes(x=question, y=p, fill=RABIES.STATUS, color=RABIES.STATUS, alpha=result)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What have been the observed changes in dog behaviour/populations?",
        subtitle=paste0("Responded: ", unique(change_in_dog_plot$n_surveys),
                        "; No answer: ", unique(change_in_dog_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
   scale_fill_manual(values=col_pal) +
+  scale_color_manual(values=col_pal) +
+  scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
 ggsave("figs/q5_change_in_dog_behav_pop.pdf", height=7, width=8)
@@ -379,7 +390,7 @@ change_in_interaction$question = factor(change_in_interaction$question,
 # Summarise data for statistics
 change_in_interaction_summary = change_in_interaction %>%
   filter(question != "NA6") %>%
-  mutate(q_n = 6) %>%
+  mutate(q_n = "6") %>%
   group_by(q_n, n_surveys, n_NAs, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
@@ -428,7 +439,7 @@ cause_for_investigating_dis$question = factor(cause_for_investigating_dis$questi
 # Summarise data for statistics
 cause_for_investigating_dis_summary = cause_for_investigating_dis %>%
   filter(question != "NA7") %>%
-  mutate(q_n = 7) %>%
+  mutate(q_n = "7") %>%
   group_by(q_n, n_surveys, n_NAs, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
@@ -479,7 +490,7 @@ change_in_health_seeking$question = factor(change_in_health_seeking$question,
 # Summarise data for statistics
 change_in_health_seeking_summary = change_in_health_seeking %>%
   filter(question != "NA8") %>%
-  mutate(q_n = 8) %>%
+  mutate(q_n = "8") %>%
   group_by(q_n, n_surveys, n_NAs, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
@@ -489,16 +500,19 @@ change_in_health_seeking_plot = change_in_health_seeking %>%
   filter(question != "NA8") %>%
   group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
   tally() %>%
-  mutate(p = round((n/n_surveys)*100, digits=1))
+  mutate(p = round((n/n_surveys)*100, digits=1),
+         result = ifelse(question=="people.still.attending.clinics", "positive", "negative"))
 
 # Produce barplot
-ggplot(data=change_in_health_seeking_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
+ggplot(data=change_in_health_seeking_plot, aes(x=question, y=p, fill=RABIES.STATUS, color=RABIES.STATUS, alpha=result)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What have been the changes in health seeking behaviour?",
        subtitle=paste0("Responded: ", unique(change_in_health_seeking_plot$n_surveys),
                        "; No answer: ", unique(change_in_health_seeking_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
   scale_fill_manual(values=col_pal) +
+  scale_color_manual(values=col_pal) +
+  scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
 ggsave("figs/q8_changes_in_health_seeking.pdf", height=7, width=8)
@@ -530,7 +544,7 @@ change_in_pep$question = factor(change_in_pep$question,
 # Summarise data for statistics
 change_in_pep_summary = change_in_pep %>%
   filter(question != "NA9") %>%
-  mutate(q_n = 9) %>%
+  mutate(q_n = "9") %>%
   group_by(q_n, n_surveys, n_NAs, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
@@ -577,7 +591,7 @@ change_in_frds_media$question = factor(change_in_frds_media$question,
 # Summarise data for statistics
 change_in_frds_media_summary = change_in_frds_media %>%
   filter(question != "NA10") %>%
-  mutate(q_n = 10) %>%
+  mutate(q_n = "10") %>%
   group_by(q_n, n_surveys, n_NAs, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
@@ -587,33 +601,253 @@ change_in_frds_media_plot = change_in_frds_media %>%
   filter(question != "NA10") %>%
   group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
   tally() %>%
-  mutate(p = round((n/n_surveys)*100, digits=1))
+  mutate(p = round((n/n_surveys)*100, digits=1),
+         result = ifelse(question %in% c("care", "none4"), "positive", "negative"))
 
 # Produce barplot
-ggplot(data=change_in_frds_media_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
+ggplot(data=change_in_frds_media_plot, aes(x=question, y=p, fill=RABIES.STATUS, color=RABIES.STATUS, alpha=result)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What have been the changes in frds in the media?",
        subtitle=paste0("Responded: ", unique(change_in_frds_media_plot$n_surveys),
                        "; No answer: ", unique(change_in_frds_media_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
   scale_fill_manual(values=col_pal) +
+  scale_color_manual(values=col_pal) +
+  scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
 ggsave("figs/q10_changes_in_frds_media.pdf", height=7, width=8)
 
+#----- Calculate additional summary statistics ---------------------------------
+
+# 4)  Can I also ask that you print out some other stats for Y?N Qs? i.e. %Yes
+#     I guess  this would be for:
+
+# Rabies budget diverted (column H)
+rabies_budget_divert = survey_data %>%
+  dplyr::select(p.n., "question"=rabies.budget.reduced.diverted) %>%
+  mutate(q_n = "Was the rabies budget reduced/diverted?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+
+# Increased demand for ARV to vets (AM)
+arv_demand_vets = survey_data %>%
+  dplyr::select(p.n., "question"=increased.demand.for.arv.to.vets) %>%
+  mutate(q_n = "Was there increased demand for ARV to vets?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+
+# Staff redeployed (BR)
+staff_redeployed = survey_data %>%
+  dplyr::select(p.n., "question"=staff.for.rabies.surveillance.redeployed) %>%
+  mutate(q_n = "Were staff for rabies surveillance redeployed?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+
+# Lab capacity diverted/reduced (BT)
+lab_capacity_reduced = survey_data %>%
+  dplyr::select(p.n., "question"=lab.capacity.diverted.reduced) %>%
+  mutate(q_n = "Was the lab capacity diverted/reduced?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+
+# Dog bites in medical guidance (DM)
+dog_bite_guidance = survey_data %>%
+  dplyr::select(p.n., "question"=dog.bites.in.medical.emergency.guidelines) %>%
+  mutate(q_n = "Is information on dog bites present in emergency guidelines?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+
+# National report happened (ED)
+national_report = survey_data %>%
+  dplyr::select(p.n., "question"=X2020.national.report.happened) %>%
+  mutate(q_n = "Was the 2020 national report conducted?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+
+# Milestones met (EF)
+milestones_met = survey_data %>%
+  dplyr::select(p.n., "question"=X2020.milestone.happened) %>%
+  mutate(q_n = "Was the 2020 milestone achieved?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+
+# One Health approach (EL)
+one_health = survey_data %>%
+  dplyr::select(p.n., "question"=oh.approach.to.rabies) %>%
+  mutate(q_n = "Is there a one health approach to Rabies?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+
+# - WRD events (DO - this was actually single select from options I believe)
+wrd_events = survey_data %>%
+  dplyr::select(p.n., "question"=impact.on.wrd.2020.events) %>%
+  mutate(q_n = "Was there an impact on WRD events in 2020?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+wrd_events$question = factor(wrd_events$question,
+                             levels=c("Yes, in-person events and mass vaccinations were cancelled",
+                                      "Yes, in-person events and mass vaccinations were held but fewer people attended them",
+                                      "No, many new online events were organized",
+                                      "Yes, all activities and information campaigns were cancelled or postponed",
+                                      "No, many in-person events were moved online",
+                                      "Other"))
+wrd_events <- arrange(wrd_events, question)
+
+# 2020 animal deaths (stats & barplot)
+animal_deaths = survey_data %>%
+  dplyr::select(p.n., "question"=X2020.animal.deaths) %>%
+  mutate(q_n = "Did the number of animal deaths change?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+animal_deaths$question = factor(animal_deaths$question,
+                             levels=c("Increased cases", "Same", "Decreased cases"))
+animal_deaths <- arrange(animal_deaths, question)
+ggplot(data=animal_deaths, aes(x=question, y=p)) +
+  geom_col() +
+  labs(x="", y="Percentage of responses", title="Did the number of animal deaths change?",
+       subtitle=paste0("Responded: ", unique(animal_deaths$n_surveys),
+                       "; No answer: ", unique(animal_deaths$n_NAs))) +
+  scale_y_continuous(limits=c(0, 100)) +
+  scale_fill_manual(values=col_pal) +
+  theme_classic() +
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+ggsave("figs/q11_animal_deaths.pdf", height=7, width=8)
+
+# 2020 animal bites (stats & barplot)
+animal_bites = survey_data %>%
+  dplyr::select(p.n., "question"=X2020.animal.bites) %>%
+  mutate(q_n = "Did the number of animal bites change?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+animal_bites$question = factor(animal_bites$question,
+                                levels=c("Increased cases", "Same", "Decreased cases"))
+animal_bites <- arrange(animal_bites, question)
+ggplot(data=animal_bites, aes(x=question, y=p)) +
+  geom_col() +
+  labs(x="", y="Percentage of responses", title="Did the number of animal bites change?",
+       subtitle=paste0("Responded: ", unique(animal_bites$n_surveys),
+                       "; No answer: ", unique(animal_bites$n_NAs))) +
+  scale_y_continuous(limits=c(0, 100)) +
+  scale_fill_manual(values=col_pal) +
+  theme_classic() +
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+ggsave("figsq12_/animal_bites.pdf", height=7, width=8)
+
+# 2020 human deaths (stats & barplot)
+human_deaths = survey_data %>%
+  dplyr::select(p.n., "question"=X2020.human.deaths) %>%
+  mutate(q_n = "Did the number of human deaths change?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+human_deaths$question = factor(human_deaths$question,
+                               levels=c("Increased cases", "Same", "Decreased cases"))
+human_deaths <- arrange(human_deaths, question)
+ggplot(data=human_deaths, aes(x=question, y=p)) +
+  geom_col() +
+  labs(x="", y="Percentage of responses", title="Did the number of human deaths change?",
+       subtitle=paste0("Responded: ", unique(human_deaths$n_surveys),
+                       "; No answer: ", unique(human_deaths$n_NAs))) +
+  scale_y_continuous(limits=c(0, 100)) +
+  scale_fill_manual(values=col_pal) +
+  theme_classic() +
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+ggsave("figs/q13_human_deaths.pdf", height=7, width=8)
+
+# - most disrupted sector ( Animal/ human/ both)
+table(survey_data$most.disrupted.sector, useNA="always")
+disrupted_sector = survey_data %>%
+  dplyr::select(p.n., "question"=most.disrupted.sector) %>%
+  mutate(q_n = "Which sector was most affected?",
+         n_surveys = length(which(!is.na(question))),
+         n_NAs = length(which(is.na(question)))) %>%
+  filter(!is.na(question)) %>%
+  group_by(q_n, n_surveys, n_NAs, question) %>%
+  tally() %>%
+  mutate(p = round((n/n_surveys)*100, digits=1))
+disrupted_sector$question = factor(disrupted_sector$question,
+                               levels=c("Both have worked well", "Both have been badly affected",
+                                        "Animal sector", "Human sector", "Other"))
+disrupted_sector <- arrange(disrupted_sector, question)
+
 #----- Finish processing summary statistics ------------------------------------
 
 # Merge question summaries together
-question_summaries = rbind(mdv_happened_2020_summary,
-                           cause_mdv_interuption_summary,
-                           mdv_method_summary,
-                           impact_on_vaccine_summary,
-                           change_in_dog_summary,
-                           change_in_interaction_summary,
-                           cause_for_investigating_dis_summary,
-                           change_in_health_seeking_summary,
-                           change_in_pep_summary,
-                           change_in_frds_media_summary)
+question_summaries = bind_rows(
+  # Add multiple choice questions
+  mdv_happened_2020_summary,
+  cause_mdv_interuption_summary,
+  mdv_method_summary,
+  impact_on_vaccine_summary,
+  change_in_dog_summary,
+  change_in_interaction_summary,
+  cause_for_investigating_dis_summary,
+  change_in_health_seeking_summary,
+  change_in_pep_summary,
+  change_in_frds_media_summary,
+  # Add in Yes/No questions
+  rabies_budget_divert,
+  arv_demand_vets,
+  staff_redeployed,
+  lab_capacity_reduced,
+  dog_bite_guidance,
+  national_report,
+  milestones_met,
+  one_health,
+  # Add last questions
+  wrd_events,
+  animal_deaths,
+  animal_bites,
+  human_deaths,
+  disrupted_sector)
 
 # Save output
 write.csv(question_summaries, "output/summary_stats.csv", row.names=FALSE)
