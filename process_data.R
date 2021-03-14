@@ -68,10 +68,14 @@ country_data$COUNTRY[which(country_data$COUNTRY=="ThailaNA")] <- "Thailand"
 country_data$COUNTRY[which(country_data$COUNTRY=="UgaNAa")] <- "Uganda"
 country_data$COUNTRY[which(country_data$COUNTRY=="United States of America")] <- "USA"
 
-# Recode countries to read as "endemic"
+# Recode countries to read as "endemic" or "controlled"
 country_data$RABIES.STATUS[which(country_data$COUNTRY=="Argentina")] <- "endemic"
 country_data$RABIES.STATUS[which(country_data$COUNTRY=="Brazil")] <- "endemic"
 country_data$RABIES.STATUS[which(country_data$COUNTRY=="Peru")] <- "endemic"
+country_data$RABIES.STATUS[which(country_data$COUNTRY=="Haiti")] <- "endemic"
+country_data$RABIES.STATUS[which(country_data$COUNTRY=="Israel")] <- "controlled"
+country_data$RABIES.STATUS[which(country_data$COUNTRY=="Kuwait")] <- "controlled"
+country_data$RABIES.STATUS[which(country_data$COUNTRY=="Saudi Arabia")] <- "controlled"
 
 # Create dataframe of countries and endemic status
 country_df <- survey_data %>%
