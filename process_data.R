@@ -5,6 +5,8 @@ library(dplyr)
 library(sf)
 library(ggplot2)
 library(tidyverse)
+devtools::install_github("dcooley/sfheaders")
+library(sfheaders)
 
 options(stringsAsFactors=FALSE,
         dplyr.summarise.inform = FALSE)
@@ -29,14 +31,27 @@ options(stringsAsFactors=FALSE,
 #' *p.n. 63 for Q9 changes in PEP had no answer, edited to be NA in data*
 
 # Load data
-country_data = read.csv("data/Country_data.csv")
+country_data = read.csv("data/country_data_V2.csv")
 survey_data = read.csv("data/Survey_data.csv")
 
 # Load shapefile
 map.world <- map_data("world")
 
+# Transform map to shapefile
+# map.world_sf <- sfheaders::sf_polygon(obj = map.world, x = "long", y = "lat", polygon_id = "group")
+# map.world_sf = map.world %>%
+#   dplyr::select(group, region) %>%
+#   unique() %>%
+#   merge(map.world_sf, ., by="group") %>%
+#   group_by(region) %>%
+#   summarise()
+#
+# leaflet() %>%
+#   addPolygons(data = map.world_sf, label=map.world_sf$region, fillColor = "white", weight=1,
+#               highlightOptions = list(fillColor="blue"))
+
 # Create colour and alpha palette
-col_pal = c("Endemic"="firebrick2", "Controlled"="#E69F00", "Not endemic"="#0072B2")
+col_pal = c("Endemic"="firebrick2", "Controlled"="#E69F00", "Not endemic"="#0072B2", "Global"="dimgrey")
 alph_pal = c("positive"=1, "negative"=0.1)
 
 # 1.  A map of countries with responses to the survey (perhaps coloured by those
@@ -69,26 +84,35 @@ country_data$COUNTRY[which(country_data$COUNTRY=="UgaNAa")] <- "Uganda"
 country_data$COUNTRY[which(country_data$COUNTRY=="United States of America")] <- "USA"
 
 # Recode countries to read as "endemic" or "controlled"
-country_data$RABIES.STATUS[which(country_data$COUNTRY=="Argentina")] <- "endemic"
-country_data$RABIES.STATUS[which(country_data$COUNTRY=="Brazil")] <- "endemic"
-country_data$RABIES.STATUS[which(country_data$COUNTRY=="Peru")] <- "endemic"
-country_data$RABIES.STATUS[which(country_data$COUNTRY=="Haiti")] <- "endemic"
-country_data$RABIES.STATUS[which(country_data$COUNTRY=="Israel")] <- "controlled"
-country_data$RABIES.STATUS[which(country_data$COUNTRY=="Kuwait")] <- "controlled"
-country_data$RABIES.STATUS[which(country_data$COUNTRY=="Saudi Arabia")] <- "controlled"
+# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Argentina")] <- "endemic"
+# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Brazil")] <- "endemic"
+# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Peru")] <- "endemic"
+# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Haiti")] <- "endemic"
+# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Israel")] <- "controlled"
+# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Kuwait")] <- "controlled"
+# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Saudi Arabia")] <- "controlled"
 
 # Create dataframe of countries and endemic status
 country_df <- survey_data %>%
   dplyr::select(country) %>%
   merge(., country_data, by.x="country", by.y="COUNTRY", all.x=TRUE) %>%
-  dplyr::select(country, RABIES.STATUS) %>%
-  mutate(RABIES.STATUS = ifelse(is.na(RABIES.STATUS), "Not endemic",
-                                ifelse(RABIES.STATUS=="endemic", "Endemic", "Controlled"))) %>%
+  dplyr::select(country, FINAL.CANINE.RABIES.STATUS) %>%
+  mutate(FINAL.CANINE.RABIES.STATUS = ifelse(FINAL.CANINE.RABIES.STATUS=="endemic", "Endemic",
+                                             ifelse(FINAL.CANINE.RABIES.STATUS=="controlled", "Controlled", "Not endemic"))) %>%
   unique()
-country_df$RABIES.STATUS = factor(country_df$RABIES.STATUS, levels=c("Endemic", "Controlled", "Not endemic"))
 
 # Merge country_df into survey data to capture endemic status
 survey_data = merge(survey_data, country_df, by="country")
+
+# Change global country names/Endemic status to "Global"
+survey_data$country[grepl("Global", survey_data$country)] <- "Global"
+survey_data$FINAL.CANINE.RABIES.STATUS[which(survey_data$country=="Global")] <- "Global"
+
+# Remove global records
+country_df <- country_df[-which(country_df$country %in% c("Global_1", "Global_2", "Global_3", "Global_4")),]
+
+# Set factor level
+country_df$FINAL.CANINE.RABIES.STATUS = factor(country_df$FINAL.CANINE.RABIES.STATUS, levels=c("Endemic", "Controlled", "Not endemic"))
 
 # Recode shapefile to match data
 country_df$country[grepl("d'Ivoire", country_df$country)] <- "Ivory Coast"
@@ -100,7 +124,6 @@ map.world <- map.world[-which(map.world$group==955),] # Remove the original Leso
 
 # CHECK!
 sort(unique(country_df$country[-which(country_df$country %in% map.world$region)]))
-#' *RS: Need to assign "Global_1", "Global_2", "Global_3" and "Global_4"*
 
 # Merge into world data
 map.world.df <- map.world %>%
@@ -113,9 +136,10 @@ map.world.df <- map.world %>%
 ggplot() +
   geom_polygon(data=map.world, aes(x=long, y=lat, group=group),
                colour="black", fill="grey95", lwd=0.04) +
-  geom_polygon(data=map.world.df, aes(x=long, y=lat, group=group, color=RABIES.STATUS, fill=RABIES.STATUS), alpha=0.6) +
-  scale_fill_manual(values = col_pal) +
-  scale_color_manual(values = col_pal) +
+  geom_polygon(data=map.world.df, aes(x=long, y=lat, group=group, color=FINAL.CANINE.RABIES.STATUS,
+                                      fill=FINAL.CANINE.RABIES.STATUS), alpha=0.6) +
+  scale_fill_manual(name="Rabies Status", values = col_pal) +
+  scale_color_manual(name="Rabies Status", values = col_pal) +
   coord_equal() +
   theme_void()
 ggsave("figs/map.pdf", height=5, width=10)
@@ -124,7 +148,7 @@ ggsave("figs/map.pdf", height=5, width=10)
 
 # Process data to select multiple choice questions
 mdv_happened_2020 = survey_data %>%
-  dplyr::select(p.n., RABIES.STATUS,  yes.as.planned, yes.but.delayed.took.longer,
+  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS,  yes.as.planned, yes.but.delayed.took.longer,
                 yes.but.below.target, no.interrupted.early,
                 no.not.started, other1, NA1) %>% # more.on.2020.mdv.happened
   gather(question, response, yes.as.planned:NA1) %>%
@@ -152,13 +176,15 @@ mdv_happened_2020_summary = mdv_happened_2020 %>%
 # Summarise data for plot
 mdv_happened_2020_plot = mdv_happened_2020 %>%
   filter(question != "NA1") %>%
-  group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
+  group_by(n_surveys, n_NAs, FINAL.CANINE.RABIES.STATUS, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1),
          result = ifelse(question=="yes.as.planned", "positive", "negative"))
+mdv_happened_2020_plot$FINAL.CANINE.RABIES.STATUS <- factor(mdv_happened_2020_plot$FINAL.CANINE.RABIES.STATUS,
+                                                            levels=c("Endemic", "Controlled", "Not endemic", "Global"))
 
 # Produce barplot
-ggplot(data=mdv_happened_2020_plot, aes(x=question, y=p, fill=RABIES.STATUS, color=RABIES.STATUS, alpha=result)) +
+ggplot(data=mdv_happened_2020_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.STATUS, color=FINAL.CANINE.RABIES.STATUS, alpha=result)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="In 2020, was MDV carried out?",
        subtitle=paste0("Responded: ", unique(mdv_happened_2020_plot$n_surveys),
@@ -168,14 +194,14 @@ ggplot(data=mdv_happened_2020_plot, aes(x=question, y=p, fill=RABIES.STATUS, col
   scale_color_manual(values=col_pal) +
   scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
-  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q1_mdv_carried_out.pdf", height=7, width=8)
 
 #----- Statistics on multiple choice Q2 ----------------------------------------
 
 # Process data to select multiple choice questions
 cause_mdv_interuption = survey_data %>%
-  dplyr::select(p.n., RABIES.STATUS, no.staff.available, restrictions.on.staff.movement,
+  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS, no.staff.available, restrictions.on.staff.movement,
                 no.vaccines.available, no.consumables.available,
                 difficult.to.adhere.to.covid.guidelines,
                 people.afraid.of.leaving.home.gathering,
@@ -207,12 +233,14 @@ cause_mdv_interuption_summary = cause_mdv_interuption %>%
 # Summarise data for plot
 cause_mdv_interuption_plot = cause_mdv_interuption %>%
   filter(question != "NA2") %>%
-  group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
+  group_by(n_surveys, n_NAs, FINAL.CANINE.RABIES.STATUS, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
+cause_mdv_interuption_plot$FINAL.CANINE.RABIES.STATUS <- factor(cause_mdv_interuption_plot$FINAL.CANINE.RABIES.STATUS,
+                                                            levels=c("Endemic", "Controlled", "Not endemic", "Global"))
 
 # Produce barplot
-ggplot(data=cause_mdv_interuption_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
+ggplot(data=cause_mdv_interuption_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.STATUS)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What were the reasons for MDV being disrupted?",
        subtitle=paste0("Responded: ", unique(cause_mdv_interuption_plot$n_surveys),
@@ -220,14 +248,14 @@ ggplot(data=cause_mdv_interuption_plot, aes(x=question, y=p, fill=RABIES.STATUS)
   scale_y_continuous(limits=c(0, 100)) +
   scale_fill_manual(values=col_pal) +
   theme_classic() +
-  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q2_reason_mdv_interupted.pdf", height=7, width=8)
 
 #----- Statistics on multiple choice Q3 ----------------------------------------
 
 # Process data to select multiple choice questions
 mdv_method = survey_data %>%
-  dplyr::select(p.n., RABIES.STATUS,  central.static.point, mobile.point, catch.vaccinate.release,
+  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS,  central.static.point, mobile.point, catch.vaccinate.release,
                 door.to.door, oral, other3, NA3) %>% # more.on.mdv.method
   gather(question, response, central.static.point:NA3) %>%
   arrange(p.n.) %>%
@@ -253,12 +281,14 @@ mdv_method_summary = mdv_method %>%
 # Summarise data for plot
 mdv_method_plot = mdv_method %>%
   filter(question != "NA3") %>%
-  group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
+  group_by(n_surveys, n_NAs, FINAL.CANINE.RABIES.STATUS, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
+mdv_method_plot$FINAL.CANINE.RABIES.STATUS <- factor(mdv_method_plot$FINAL.CANINE.RABIES.STATUS,
+                                                                levels=c("Endemic", "Controlled", "Not endemic", "Global"))
 
 # Produce barplot
-ggplot(data=mdv_method_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
+ggplot(data=mdv_method_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.STATUS)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What was the method of MDV?",
        subtitle=paste0("Responded: ", unique(mdv_method_plot$n_surveys),
@@ -266,14 +296,14 @@ ggplot(data=mdv_method_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
   scale_y_continuous(limits=c(0, 100)) +
   scale_fill_manual(values=col_pal) +
   theme_classic() +
-  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q3_mdv_method.pdf", height=7, width=8)
 
 #----- Statistics on multiple choice Q4 ----------------------------------------
 
 # Process data to select multiple choice questions
 impact_on_vaccine = survey_data %>%
-  dplyr::select(p.n., RABIES.STATUS,  yes.production.has.considerably.reduced, yes.production.has.reduced,
+  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS,  yes.production.has.considerably.reduced, yes.production.has.reduced,
                 yes.importation.delayed, yes.importation.reduced, yes.distribution.affected,
                 none1, other4, NA4) %>% # more.on.impact.on.vaccine.production.supply.chains
   gather(question, response, yes.production.has.considerably.reduced:NA4) %>%
@@ -301,13 +331,15 @@ impact_on_vaccine_summary = impact_on_vaccine %>%
 # Summarise data for plot
 impact_on_vaccine_plot = impact_on_vaccine %>%
   filter(question != "NA4") %>%
-  group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
+  group_by(n_surveys, n_NAs, FINAL.CANINE.RABIES.STATUS, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1),
          result = ifelse(question=="none1", "positive", "negative"))
+impact_on_vaccine_plot$FINAL.CANINE.RABIES.STATUS <- factor(impact_on_vaccine_plot$FINAL.CANINE.RABIES.STATUS,
+                                                     levels=c("Endemic", "Controlled", "Not endemic", "Global"))
 
 # Produce barplot
-ggplot(data=impact_on_vaccine_plot, aes(x=question, y=p, fill=RABIES.STATUS, color=RABIES.STATUS, alpha=result)) +
+ggplot(data=impact_on_vaccine_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.STATUS, color=FINAL.CANINE.RABIES.STATUS, alpha=result)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What has been the impact on vaccine production/supply chains?",
        subtitle=paste0("Responded: ", unique(impact_on_vaccine_plot$n_surveys),
@@ -317,14 +349,14 @@ ggplot(data=impact_on_vaccine_plot, aes(x=question, y=p, fill=RABIES.STATUS, col
   scale_color_manual(values=col_pal) +
   scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
-  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q4_impact_on_vaccine.pdf", height=7, width=8)
 
 #----- Statistics on multiple choice Q5 ----------------------------------------
 
 # Process data to select multiple choice questions
 change_in_dog = survey_data %>%
-  dplyr::select(p.n., RABIES.STATUS,  more.roaming.dogs, fewer.roaming.dogs, dogs.more.aggressive,
+  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS,  more.roaming.dogs, fewer.roaming.dogs, dogs.more.aggressive,
                 dogs.in.poorer.health, none2, other5, NA5) %>% # more.on.changes.in.dog.behaviour.populations
   gather(question, response, more.roaming.dogs:NA5) %>%
   arrange(p.n.) %>%
@@ -350,13 +382,15 @@ change_in_dog_summary = change_in_dog %>%
 # Summarise data for plot
 change_in_dog_plot = change_in_dog %>%
   filter(question != "NA5") %>%
-  group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
+  group_by(n_surveys, n_NAs, FINAL.CANINE.RABIES.STATUS, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1),
          result = ifelse(question=="fewer.roaming.dogs", "positive", "negative"))
+change_in_dog_plot$FINAL.CANINE.RABIES.STATUS <- factor(change_in_dog_plot$FINAL.CANINE.RABIES.STATUS,
+                                                            levels=c("Endemic", "Controlled", "Not endemic", "Global"))
 
 # Produce barplot
-ggplot(data=change_in_dog_plot, aes(x=question, y=p, fill=RABIES.STATUS, color=RABIES.STATUS, alpha=result)) +
+ggplot(data=change_in_dog_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.STATUS, color=FINAL.CANINE.RABIES.STATUS, alpha=result)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What have been the observed changes in dog behaviour/populations?",
        subtitle=paste0("Responded: ", unique(change_in_dog_plot$n_surveys),
@@ -366,14 +400,14 @@ ggplot(data=change_in_dog_plot, aes(x=question, y=p, fill=RABIES.STATUS, color=R
   scale_color_manual(values=col_pal) +
   scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
-  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q5_change_in_dog_behav_pop.pdf", height=7, width=8)
 
 #----- Statistics on multiple choice Q6 ----------------------------------------
 
 # Process data to select multiple choice questions
 change_in_interaction = survey_data %>%
-  dplyr::select(p.n., RABIES.STATUS,  more.people.fed.them, people.complained, people.asked.for.removal.kill,
+  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS,  more.people.fed.them, people.complained, people.asked.for.removal.kill,
                 people.removed.killed.them, official.workers.removed.killed.them,
                 more.abandonment.due.to.fear.of.covid, more.abandonment.due.to.financial.constraints,
                 more.abandonment.for.other.reasons, none3, other6, NA6) %>% # more.on.changes.in.human.frds.interactions
@@ -402,12 +436,14 @@ change_in_interaction_summary = change_in_interaction %>%
 # Summarise data for plot
 change_in_interaction_plot = change_in_interaction %>%
   filter(question != "NA6") %>%
-  group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
+  group_by(n_surveys, n_NAs, FINAL.CANINE.RABIES.STATUS, question) %>%
   tally()%>%
   mutate(p = round((n/n_surveys)*100, digits=1))
+change_in_interaction_plot$FINAL.CANINE.RABIES.STATUS <- factor(change_in_interaction_plot$FINAL.CANINE.RABIES.STATUS,
+                                                        levels=c("Endemic", "Controlled", "Not endemic", "Global"))
 
 # Produce barplot
-ggplot(data=change_in_interaction_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
+ggplot(data=change_in_interaction_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.STATUS)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What have been the observed changes in human-frds interactions?",
        subtitle=paste0("Responded: ", unique(change_in_interaction_plot$n_surveys),
@@ -415,14 +451,14 @@ ggplot(data=change_in_interaction_plot, aes(x=question, y=p, fill=RABIES.STATUS)
   scale_y_continuous(limits=c(0, 100)) +
   scale_fill_manual(values=col_pal) +
   theme_classic() +
-  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q6_change_in_human_frds_interactions.pdf", height=7, width=8)
 
 #----- Statistics on multiple choice Q7 ----------------------------------------
 
 # Process data to select multiple choice questions
 cause_for_investigating_dis = survey_data %>%
-  dplyr::select(p.n., RABIES.STATUS,  no.staff.available.1, restrictions.on.staff.movement.1,
+  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS,  no.staff.available.1, restrictions.on.staff.movement.1,
                 no.sample.collection.testing.kit.available, no.budget,
                 difficult.to.adhere.to.covid.guidelines.1, investigators.not.welcomed.in.communities,
                 other7, NA7) %>% # more.on.reasons.for.investigating.reporting.disruption
@@ -451,12 +487,14 @@ cause_for_investigating_dis_summary = cause_for_investigating_dis %>%
 # Summarise data for plot
 cause_for_investigating_dis_plot = cause_for_investigating_dis %>%
   filter(question != "NA7") %>%
-  group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
+  group_by(n_surveys, n_NAs, FINAL.CANINE.RABIES.STATUS, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
+cause_for_investigating_dis_plot$FINAL.CANINE.RABIES.STATUS <- factor(cause_for_investigating_dis_plot$FINAL.CANINE.RABIES.STATUS,
+                                                                levels=c("Endemic", "Controlled", "Not endemic", "Global"))
 
 # Produce barplot
-ggplot(data=cause_for_investigating_dis_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
+ggplot(data=cause_for_investigating_dis_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.STATUS)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What have been the reasons for investigating/reporting disruption?",
        subtitle=paste0("Responded: ", unique(cause_for_investigating_dis_plot$n_surveys),
@@ -464,14 +502,14 @@ ggplot(data=cause_for_investigating_dis_plot, aes(x=question, y=p, fill=RABIES.S
   scale_y_continuous(limits=c(0, 100)) +
   scale_fill_manual(values=col_pal) +
   theme_classic() +
-  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q7_reason_for_investigating_reporting.pdf", height=7, width=8)
 
 #----- Statistics on multiple choice Q8 ----------------------------------------
 
 # Process data to select multiple choice questions
 change_in_health_seeking = survey_data %>%
-  dplyr::select(p.n., RABIES.STATUS,  people.still.attending.clinics, people.have.avoided.clinics.due.to.fear.of.covid,
+  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS,  people.still.attending.clinics, people.have.avoided.clinics.due.to.fear.of.covid,
                 people.cannot.afford.travel, people.cannot.reach.clinics.because.of.reduced.public.transport,
                 people.have.delayed.going.to.clinics, people.have.interrupted.pep,
                 people.have.relied.more.on.local.remedies, people.have.called.toll.free.numbers,
@@ -502,13 +540,15 @@ change_in_health_seeking_summary = change_in_health_seeking %>%
 # Summarise data for plot
 change_in_health_seeking_plot = change_in_health_seeking %>%
   filter(question != "NA8") %>%
-  group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
+  group_by(n_surveys, n_NAs, FINAL.CANINE.RABIES.STATUS, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1),
          result = ifelse(question=="people.still.attending.clinics", "positive", "negative"))
+change_in_health_seeking_plot$FINAL.CANINE.RABIES.STATUS <- factor(change_in_health_seeking_plot$FINAL.CANINE.RABIES.STATUS,
+                                                                      levels=c("Endemic", "Controlled", "Not endemic", "Global"))
 
 # Produce barplot
-ggplot(data=change_in_health_seeking_plot, aes(x=question, y=p, fill=RABIES.STATUS, color=RABIES.STATUS, alpha=result)) +
+ggplot(data=change_in_health_seeking_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.STATUS, color=FINAL.CANINE.RABIES.STATUS, alpha=result)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What have been the changes in health seeking behaviour?",
        subtitle=paste0("Responded: ", unique(change_in_health_seeking_plot$n_surveys),
@@ -518,14 +558,14 @@ ggplot(data=change_in_health_seeking_plot, aes(x=question, y=p, fill=RABIES.STAT
   scale_color_manual(values=col_pal) +
   scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
-  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q8_changes_in_health_seeking.pdf", height=7, width=8)
 
 #----- Statistics on multiple choice Q9 ----------------------------------------
 
 # Process data to select multiple choice questions
 change_in_pep = survey_data %>%
-  dplyr::select(p.n., RABIES.STATUS,  some.many.arc.closed.converted, staff.redeployed, staff.reduced.due.to.quarantine,
+  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS,  some.many.arc.closed.converted, staff.redeployed, staff.reduced.due.to.quarantine,
                 staff.less.diligent.due.to.stress, staff.less.likely.to.recommend.pep,
                 follow.up.shots.delayed.cancelled, vaccines.out.of.stock.because.of.financial.constraints,
                 vaccines.out.of.stock.due.to.supply.issues, vaccines.available.only.in.the.private.sector,
@@ -556,12 +596,14 @@ change_in_pep_summary = change_in_pep %>%
 # Summarise data for plot
 change_in_pep_plot = change_in_pep %>%
   filter(question != "NA9") %>%
-  group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
+  group_by(n_surveys, n_NAs, FINAL.CANINE.RABIES.STATUS, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1))
+change_in_pep_plot$FINAL.CANINE.RABIES.STATUS <- factor(change_in_pep_plot$FINAL.CANINE.RABIES.STATUS,
+                                                                   levels=c("Endemic", "Controlled", "Not endemic", "Global"))
 
 # Produce barplot
-ggplot(data=change_in_pep_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
+ggplot(data=change_in_pep_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.STATUS)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What have been the changes in PEP?",
        subtitle=paste0("Responded: ", unique(change_in_pep_plot$n_surveys),
@@ -569,14 +611,14 @@ ggplot(data=change_in_pep_plot, aes(x=question, y=p, fill=RABIES.STATUS)) +
   scale_y_continuous(limits=c(0, 100)) +
   scale_fill_manual(values=col_pal) +
   theme_classic() +
-  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q9_changes_in_pep.pdf", height=7, width=8)
 
 #----- Statistics on multiple choice Q10 ---------------------------------------
 
 # Process data to select multiple choice questions
 change_in_frds_media = survey_data %>%
-  dplyr::select(p.n., RABIES.STATUS, attacks.on.dogs, attacks.on.other.animals, attacks.on.humans,
+  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS, attacks.on.dogs, attacks.on.other.animals, attacks.on.humans,
                 animal.rabies.cases.deaths, human.exposures.deaths, human.cruelty,
                 care, none4, other10, NA10) %>% # more.on.changes.in.frds.in.the.media
   gather(question, response, attacks.on.dogs:NA10) %>%
@@ -603,13 +645,15 @@ change_in_frds_media_summary = change_in_frds_media %>%
 # Summarise data for plot
 change_in_frds_media_plot = change_in_frds_media %>%
   filter(question != "NA10") %>%
-  group_by(n_surveys, n_NAs, RABIES.STATUS, question) %>%
+  group_by(n_surveys, n_NAs, FINAL.CANINE.RABIES.STATUS, question) %>%
   tally() %>%
   mutate(p = round((n/n_surveys)*100, digits=1),
          result = ifelse(question %in% c("care", "none4"), "positive", "negative"))
+change_in_frds_media_plot$FINAL.CANINE.RABIES.STATUS <- factor(change_in_frds_media_plot$FINAL.CANINE.RABIES.STATUS,
+                                                        levels=c("Endemic", "Controlled", "Not endemic", "Global"))
 
 # Produce barplot
-ggplot(data=change_in_frds_media_plot, aes(x=question, y=p, fill=RABIES.STATUS, color=RABIES.STATUS, alpha=result)) +
+ggplot(data=change_in_frds_media_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.STATUS, color=FINAL.CANINE.RABIES.STATUS, alpha=result)) +
   geom_col() +
   labs(x="", y="Percentage of responses", title="What have been the changes in frds in the media?",
        subtitle=paste0("Responded: ", unique(change_in_frds_media_plot$n_surveys),
@@ -619,7 +663,7 @@ ggplot(data=change_in_frds_media_plot, aes(x=question, y=p, fill=RABIES.STATUS, 
   scale_color_manual(values=col_pal) +
   scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
-  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
+  theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q10_changes_in_frds_media.pdf", height=7, width=8)
 
 #----- Calculate additional summary statistics ---------------------------------
