@@ -4,7 +4,7 @@
 
 # Process data to select multiple choice questions
 mdv_happened_2020 = survey_data %>%
-  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS,  yes.as.planned, yes.but.delayed.took.longer,
+  dplyr::select(p.n., country, FINAL.CANINE.RABIES.STATUS,  yes.as.planned, yes.but.delayed.took.longer,
                 yes.but.below.target, no.interrupted.early,
                 no.not.started, other1, NA1) %>% # more.on.2020.mdv.happened
   gather(question, response, yes.as.planned:NA1) %>%
