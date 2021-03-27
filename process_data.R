@@ -151,7 +151,7 @@ ggsave("figs/paper/map.pdf", height=8, width=14)
 
 source("R/produce_initial_stats.R")
 
-#----- Produce further figs and stats ------------------------------------------
+#----- Produce multi-panel barplot ---------------------------------------------
 
 # Set colours for different sectors
 sector_cols = c("vet"="#4080ff", "health"="#ffbf40", "surveillance"="#74e539")
@@ -274,5 +274,58 @@ annotate_figure(multi_plot,
                                    hjust = 1, x = 1, face = "italic", size = 10))
 ggsave("figs/paper/multi_panel_barplot.pdf", height=10, width=8)
 
-#----- Produce Map -------------------------------------------------------------
+#----- Produce map with yes/no responses ---------------------------------------
 
+# Transform world map to sf object
+map_sf = st_as_sf(map.world.df, coords=c("long", "lat"))
+
+# Extract country centroids
+map_centroids = map_sf %>%
+   group_by(region) %>%
+  summarise() %>%
+  st_centroid()
+
+# Create base map
+base_map = ggplot() +
+  geom_polygon(data=map.world, aes(x=long, y=lat, group=group),
+               fill="grey75", lwd=0.04) +
+  geom_polygon(data=map.world.df, aes(x=long, y=lat, group=group),
+               fill="grey50", color="grey35", lwd=0.04) +
+  coord_sf() +
+  theme_void()
+
+# Plot map to check centroid location
+base_map + geom_sf(data=map_centroids)
+
+# Set map point colours and shapes
+col_pal = c("circle"="black", "cross"="red")
+fill_pal = c("fill"="black", "empty"="white", "none"="red")
+shap_pal = c("circle"=21, "cross"=4)
+
+#' _RS: What to do when you get multiple opposing responses from a single country e.g. Tanzania (regional differences)_
+# Test question to plot - was MDV carried out?
+mdv_carried_out = mdv_happened_2020 %>%
+  mutate(col = ifelse(question %in% c("yes.as.planned", "yes.but.delayed.took.longer", "yes.but.below.target", "other1"), "empty",
+                     ifelse(question %in% c("no.interrupted.early", "no.not.started"), "fill", "none")),
+         shap = ifelse(question == "NA1", "cross", "circle")) %>%
+  dplyr::select(country, col, shap) %>%
+  unique()
+
+#' _RS: For now, use fill if present_
+country_list = c("C??te d'Ivoire", "Ghana", "India", "Kenya", "Nepal", "Pakistan", "South Africa", "Sri Lanka", "Tanzania")
+mdv_carried_out = mdv_carried_out[-which(mdv_carried_out$country %in% country_list & mdv_carried_out$col == "empty"),]
+country_list = c("Bangladesh", "Brunei")
+mdv_carried_out = mdv_carried_out[-which(mdv_carried_out$country %in% country_list & mdv_carried_out$col == "none"),]
+
+# Merge into centroid data
+mdv_centroids = map_centroids %>%
+  merge(., mdv_carried_out, by.x="region", by.y="country", all.x=TRUE) %>%
+  filter(!is.na(col))
+
+# View on the map
+base_map + geom_sf(data=mdv_centroids, aes(color=shap, fill=col, shape=shap), stroke=1, size=2) +
+  scale_color_manual(values=col_pal) +
+  scale_fill_manual(values=fill_pal) +
+  scale_shape_manual(values=shap_pal) +
+  theme(legend.position = "none")
+ggsave("figs/paper/map_mdv_happened.pdf", width=10, height=6)
