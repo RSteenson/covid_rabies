@@ -52,7 +52,7 @@ map.world <- map_data("world")
 #               highlightOptions = list(fillColor="blue"))
 
 # Create colour and alpha palette
-col_pal = c("Endemic"="firebrick2", "Controlled"="#E69F00", "Not endemic"="#0072B2", "Global"="dimgrey")
+col_pal = c("Endemic"="red2", "Controlled"="#ff6666", "Not endemic"="grey35", "Global"="dimgrey")
 alph_pal = c("positive"=1, "negative"=0.1)
 
 # 1.  A map of countries with responses to the survey (perhaps coloured by those
@@ -136,16 +136,16 @@ map.world.df <- map.world %>%
 # Plot map
 ggplot() +
   geom_polygon(data=map.world, aes(x=long, y=lat, group=group),
-               fill="grey50", lwd=0.04) + # colour="black",
+               fill="grey75", lwd=0.04) + # colour="black",
   geom_polygon(data=map.world.df, aes(x=long, y=lat, group=group), fill="white") +
   geom_polygon(data=map.world.df, aes(x=long, y=lat, group=group, color=FINAL.CANINE.RABIES.STATUS,
-                                      fill=FINAL.CANINE.RABIES.STATUS), alpha=0.6) +
+                                      fill=FINAL.CANINE.RABIES.STATUS), alpha=0.8) +
   scale_fill_manual(name="Rabies Status", values = col_pal) +
   scale_color_manual(name="Rabies Status", values = col_pal) +
   coord_equal() +
   theme_void() +
   theme(legend.position = "top")
-ggsave("figs/map.pdf", height=8, width=14)
+ggsave("figs/paper/map.pdf", height=8, width=14)
 
 #----- Produce initial stats ---------------------------------------------------
 
@@ -273,3 +273,6 @@ annotate_figure(multi_plot,
                                    C: Observed changes in health seeking behaviour | D: Reasons for PEP disruption",
                                    hjust = 1, x = 1, face = "italic", size = 10))
 ggsave("figs/paper/multi_panel_barplot.pdf", height=10, width=8)
+
+#----- Produce Map -------------------------------------------------------------
+
