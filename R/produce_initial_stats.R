@@ -159,7 +159,7 @@ ggsave("figs/q3_mdv_method.pdf", height=7, width=8)
 
 # Process data to select multiple choice questions
 impact_on_vaccine = survey_data %>%
-  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS,  yes.production.has.considerably.reduced, yes.production.has.reduced,
+  dplyr::select(p.n., country, FINAL.CANINE.RABIES.STATUS,  yes.production.has.considerably.reduced, yes.production.has.reduced,
                 yes.importation.delayed, yes.importation.reduced, yes.distribution.affected,
                 none1, other4, NA4) %>% # more.on.impact.on.vaccine.production.supply.chains
   gather(question, response, yes.production.has.considerably.reduced:NA4) %>%
@@ -365,7 +365,7 @@ ggsave("figs/q7_reason_for_investigating_reporting.pdf", height=7, width=8)
 
 # Process data to select multiple choice questions
 change_in_health_seeking = survey_data %>%
-  dplyr::select(p.n., FINAL.CANINE.RABIES.STATUS,  people.still.attending.clinics, people.have.avoided.clinics.due.to.fear.of.covid,
+  dplyr::select(p.n., country, FINAL.CANINE.RABIES.STATUS,  people.still.attending.clinics, people.have.avoided.clinics.due.to.fear.of.covid,
                 people.cannot.afford.travel, people.cannot.reach.clinics.because.of.reduced.public.transport,
                 people.have.delayed.going.to.clinics, people.have.interrupted.pep,
                 people.have.relied.more.on.local.remedies, people.have.called.toll.free.numbers,
