@@ -341,5 +341,5 @@ ggsave("figs/paper/map_wrd_events.pdf", width=10, height=6)
 ggarrange(budget_divert_map, mdv_map, arv_demand_map,
           arv_supply_map, staff_redeployed_map, lab_capacity_map,
           health_seeking_map, dog_bite_guidance_map, wrd_impact_map,
-          ncol=3, nrow=3)
+          ncol=3, nrow=3, common.legend = TRUE)
 ggsave("figs/paper/combined_map.pdf", width=15, height=9)
