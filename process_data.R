@@ -12,6 +12,9 @@ library(ggpubr)
 options(stringsAsFactors=FALSE,
         dplyr.summarise.inform = FALSE)
 
+# Load functions
+source("R/point_map.R")
+
 # DATA:
 # - The "survey questions" file with each Q and Q type (multi choice, single
 #   choice, etc) on a row.
@@ -274,7 +277,7 @@ annotate_figure(multi_plot,
                                    hjust = 1, x = 1, face = "italic", size = 10))
 ggsave("figs/paper/multi_panel_barplot.pdf", height=10, width=8)
 
-#----- Produce map with yes/no responses ---------------------------------------
+#----- Produce maps with yes/no responses --------------------------------------
 
 # Transform world map to sf object
 map_sf = st_as_sf(map.world.df, coords=c("long", "lat"))
@@ -299,33 +302,44 @@ base_map + geom_sf(data=map_centroids)
 
 # Set map point colours and shapes
 col_pal = c("circle"="black", "cross"="red")
-fill_pal = c("fill"="black", "empty"="white", "none"="red")
+fill_pal = c(sector_cols, "fill"="black", "empty"="white", "none"="red")
 shap_pal = c("circle"=21, "cross"=4)
 
-#' _RS: What to do when you get multiple opposing responses from a single country e.g. Tanzania (regional differences)_
-# Test question to plot - was MDV carried out?
-mdv_carried_out = mdv_happened_2020 %>%
-  mutate(col = ifelse(question %in% c("yes.as.planned", "yes.but.delayed.took.longer", "yes.but.below.target", "other1"), "empty",
-                     ifelse(question %in% c("no.interrupted.early", "no.not.started"), "fill", "none")),
-         shap = ifelse(question == "NA1", "cross", "circle")) %>%
-  dplyr::select(country, col, shap) %>%
-  unique()
+# Run script to complete processing
+source("R/process_yes_no.R")
 
-#' _RS: For now, use fill if present_
-country_list = c("C??te d'Ivoire", "Ghana", "India", "Kenya", "Nepal", "Pakistan", "South Africa", "Sri Lanka", "Tanzania")
-mdv_carried_out = mdv_carried_out[-which(mdv_carried_out$country %in% country_list & mdv_carried_out$col == "empty"),]
-country_list = c("Bangladesh", "Brunei")
-mdv_carried_out = mdv_carried_out[-which(mdv_carried_out$country %in% country_list & mdv_carried_out$col == "none"),]
-
-# Merge into centroid data
-mdv_centroids = map_centroids %>%
-  merge(., mdv_carried_out, by.x="region", by.y="country", all.x=TRUE) %>%
-  filter(!is.na(col))
-
-# View on the map
-base_map + geom_sf(data=mdv_centroids, aes(color=shap, fill=col, shape=shap), stroke=1, size=2) +
-  scale_color_manual(values=col_pal) +
-  scale_fill_manual(values=fill_pal) +
-  scale_shape_manual(values=shap_pal) +
-  theme(legend.position = "none")
+# Produce maps, and save as individual files
+budget_divert_map = point_map(dataframe=budget_divert_centroids,
+                              map_title="Was the budget for rabies \nprevention/control reduced/diverted?")
+ggsave("figs/paper/map_budget_divert.pdf", width=10, height=6)
+mdv_map = point_map(dataframe=mdv_centroids,
+                    map_title="Was MDV carried out in 2020?")
 ggsave("figs/paper/map_mdv_happened.pdf", width=10, height=6)
+arv_demand_map = point_map(dataframe=increased_arv_demand_centroids,
+                    map_title="Have vets experienced higher demand for ARV?")
+ggsave("figs/paper/map_vet_arv_demand.pdf", width=10, height=6)
+arv_supply_map = point_map(dataframe=arv_supply_centroids,
+                           map_title="Has ARV production/supply been affected?")
+ggsave("figs/paper/map_vet_arv_supply.pdf", width=10, height=6)
+staff_redeployed_map = point_map(dataframe=staff_redeployed_centroids,
+                           map_title="Were surveillance staff redeployed?")
+ggsave("figs/paper/map_surv_staff_redeployed.pdf", width=10, height=6)
+lab_capacity_map = point_map(dataframe=lab_capacity_centroids,
+                                 map_title="Was lab capacity reduced/diverted?")
+ggsave("figs/paper/map_lab_capacity.pdf", width=10, height=6)
+health_seeking_map = point_map(dataframe=health_seeking_centroids,
+                             map_title="Were there changes in health seeking behaviour?")
+ggsave("figs/paper/map_health_seeking.pdf", width=10, height=6)
+dog_bite_guidance_map = point_map(dataframe=dog_bite_guidance_centroids,
+                               map_title="Have dog bites been mentioned in \npublic guidance during the pandemic?")
+ggsave("figs/paper/map_bite_guidance.pdf", width=10, height=6)
+wrd_impact_map = point_map(dataframe=wrd_impact_centroids,
+                           map_title="Were WRD events impacted in 2020?")
+ggsave("figs/paper/map_wrd_events.pdf", width=10, height=6)
+
+# Produce combined map (panelled currently)
+ggarrange(budget_divert_map, mdv_map, arv_demand_map,
+          arv_supply_map, staff_redeployed_map, lab_capacity_map,
+          health_seeking_map, dog_bite_guidance_map, wrd_impact_map,
+          ncol=3, nrow=3)
+ggsave("figs/paper/combined_map.pdf", width=15, height=9)
