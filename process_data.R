@@ -301,9 +301,9 @@ base_map = ggplot() +
 base_map + geom_sf(data=map_centroids)
 
 # Set map point colours and shapes
-col_pal = c("circle"="black", "cross"="red")
-fill_pal = c(sector_cols, "fill"="black", "empty"="white", "none"="red")
-shap_pal = c("circle"=21, "cross"=4)
+# col_pal = c("circle"="black", "cross"="red")
+# fill_pal = c(sector_cols, "fill"="black", "empty"="white", "none"="red")
+# shap_pal = c("circle"=21, "cross"=4)
 
 # Run script to complete processing
 source("R/process_yes_no.R")

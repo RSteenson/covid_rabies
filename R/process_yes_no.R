@@ -9,7 +9,7 @@
 #' 18. have staff for rabies surveillance been moved elsewhere?
 #' 19. has lab capacity been reduced/diverted?
 #' 24. has health-seeking behaviour changed?
-#' 28. during the pandemic, have dog bites been mentioned in public guidence about circumstances that require immediate medical attention?
+#' 28. during the pandemic, have dog bites been mentioned in public guidance about circumstances that require immediate medical attention?
 #' 30. have rabies awareness campaigns been affected?
 
 rm_multi_response = function(dataframe){
@@ -42,7 +42,7 @@ rabies_budget_diverted_proc = rm_multi_response(rabies_budget_diverted)
 # Add formatting for map plot
 rabies_budget_diverted_proc = rabies_budget_diverted_proc %>%
   mutate(col = ifelse(is.na(impacted), "none",
-                      ifelse(impacted == "Yes", "fill", "empty")),
+                      ifelse(impacted == "Yes", "cross-sectoral", "empty")),
          shap = ifelse(is.na(impacted), "cross", "circle")) %>%
   dplyr::select(country, col, shap) %>%
   unique()
@@ -222,7 +222,7 @@ wrd_impact_proc = rm_multi_response(wrd_impact)
 # Add formatting for map plot
 wrd_impact_proc = wrd_impact_proc %>%
   mutate(col = ifelse(is.na(impacted), "none",
-                      ifelse(impacted == "Yes", "fill", "empty")),
+                      ifelse(impacted == "Yes", "cross-sectoral", "empty")),
          shap = ifelse(is.na(impacted), "cross", "circle")) %>%
   dplyr::select(country, col, shap) %>%
   unique()
