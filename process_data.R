@@ -13,6 +13,7 @@ options(stringsAsFactors=FALSE,
         dplyr.summarise.inform = FALSE)
 
 # Load functions
+source("R/recode_countries.R")
 source("R/point_map.R")
 
 # DATA:
@@ -39,62 +40,31 @@ country_data = read.csv("data/country_data_V2.csv")
 survey_data = read.csv("data/Survey_data.csv")
 
 # Load shapefile
-map.world <- map_data("world")
-
-# Transform map to shapefile
-# map.world_sf <- sfheaders::sf_polygon(obj = map.world, x = "long", y = "lat", polygon_id = "group")
-# map.world_sf = map.world %>%
-#   dplyr::select(group, region) %>%
-#   unique() %>%
-#   merge(map.world_sf, ., by="group") %>%
-#   group_by(region) %>%
-#   summarise()
-#
-# leaflet() %>%
-#   addPolygons(data = map.world_sf, label=map.world_sf$region, fillColor = "white", weight=1,
-#               highlightOptions = list(fillColor="blue"))
+map.world = read_sf("data/WHO Map boundaries/MapTemplate_detailed_2013/Shapefiles/detailed_2013.shp")
 
 # Create colour and alpha palette
-col_pal = c("Endemic"="red2", "Controlled"="#ff6666", "Not endemic"="grey35", "Global"="dimgrey")
+col_pal_1 = c("Endemic"="red2", "Controlled"="#ff6666", "Not endemic"="grey35", "Global"="dimgrey")
+col_pal_2 = c("Endemic"="firebrick2", "Controlled"="#E69F00", "Not endemic"="#18ca08", "Global"="dimgrey")
 alph_pal = c("positive"=1, "negative"=0.1)
-
-# 1.  A map of countries with responses to the survey (perhaps coloured by those
-#     with endemic dog rabies or not - can always use Gavi data on this)
-# 2.  Some summary statistics of responses to Y/N questions (basically % Y/N) -
-#     but these will need to be adjusted for the denominator (i..e if skipped response is NA)
-# 3.  Some barplots of responses to multi choice Qs. e.g. what were reasons for
-#     disruption to mass dog vaccinations (there are 10 multi choice Qs like this),
-#     possibly stacked barplots for responses from countries that are rabies endemic vs free.
 
 #----- Initial data processing -------------------------------------------------
 
 # Remove Antarctica
-map.world <- map.world[-which(map.world$region=="Antarctica"),]
+# map.world <- map.world[-which(map.world$region=="Antarctica"),]
 
 # Remove trailing white space in country names
-map.world$region <- trimws(map.world$region, which="right")
 survey_data$country <- trimws(survey_data$country, which="right")
 
-# Recode names to match between data
-country_data$COUNTRY[which(country_data$COUNTRY=="Brunei Darussalam")] <- "Brunei"
-country_data$COUNTRY[which(country_data$COUNTRY=="Guinea-Bissau")] <- "Guinea Bissau"
-country_data$COUNTRY[which(country_data$COUNTRY=="INAia")] <- "India"
-country_data$COUNTRY[which(country_data$COUNTRY=="INAonesia")] <- "Indonesia"
-country_data$COUNTRY[which(country_data$COUNTRY=="Lao People's Democratic Republic")] <- "Laos"
-country_data$COUNTRY[which(country_data$COUNTRY=="Taiwan Province of China")] <- "Taiwan"
-country_data$COUNTRY[which(country_data$COUNTRY=="Tanzania, United Republic of ")] <- "Tanzania"
-country_data$COUNTRY[which(country_data$COUNTRY=="ThailaNA")] <- "Thailand"
-country_data$COUNTRY[which(country_data$COUNTRY=="UgaNAa")] <- "Uganda"
-country_data$COUNTRY[which(country_data$COUNTRY=="United States of America")] <- "USA"
+# Set Taiwan as endemic as must be classed as part of Chine
+country_data$FINAL.CANINE.RABIES.STATUS[which(country_data$COUNTRY=="Taiwan Province of China")] <- "endemic"
 
-# Recode countries to read as "endemic" or "controlled"
-# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Argentina")] <- "endemic"
-# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Brazil")] <- "endemic"
-# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Peru")] <- "endemic"
-# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Haiti")] <- "endemic"
-# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Israel")] <- "controlled"
-# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Kuwait")] <- "controlled"
-# country_data$RABIES.STATUS[which(country_data$COUNTRY=="Saudi Arabia")] <- "controlled"
+# Recode names to match between data
+survey_data <- recode_countries(survey_data, "country")
+country_data <- recode_countries(country_data, "COUNTRY")
+
+# Check if any names don't match data
+survey_data$country[-which(survey_data$country %in% map.world$CNTRY_TERR)]
+country_data$COUNTRY[-which(country_data$COUNTRY %in% map.world$CNTRY_TERR)]
 
 # Create dataframe of countries and endemic status
 country_df <- survey_data %>%
@@ -118,37 +88,36 @@ country_df <- country_df[-which(country_df$country %in% c("Global_1", "Global_2"
 # Set factor level
 country_df$FINAL.CANINE.RABIES.STATUS = factor(country_df$FINAL.CANINE.RABIES.STATUS, levels=c("Endemic", "Controlled", "Not endemic"))
 
-# Recode shapefile to match data
-country_df$country[grepl("d'Ivoire", country_df$country)] <- "Ivory Coast"
-map.world$region[which(map.world$region=="Guinea-Bissau")] <- "Guinea Bissau"
-map.world$region[which(map.world$region=="Swaziland")] <- "Eswatini"
-map.world$region[which(map.world$region=="South Africa" & map.world$subregion=="enclave")] <- "Lesotho"
-map.world$subregion[which(map.world$region=="South Africa" & map.world$subregion=="enclave")] <- ""
-map.world <- map.world[-which(map.world$group==955),] # Remove the original Lesotho, which was double mapped
-
 # CHECK!
-sort(unique(country_df$country[-which(country_df$country %in% map.world$region)]))
+sort(unique(country_df$country[-which(country_df$country %in% map.world$CNTRY_TERR)]))
 
 # Merge into world data
 map.world.df <- map.world %>%
-  merge(., country_df, by.x="region", by.y="country", all.y=T) %>%
-  arrange(region, group, order)
+  merge(., country_df, by.x="CNTRY_TERR", by.y="country", all.y=T)
 
 #----- Produce map -------------------------------------------------------------
 
 # Plot map
 ggplot() +
-  geom_polygon(data=map.world, aes(x=long, y=lat, group=group),
-               fill="grey75", lwd=0.04) + # colour="black",
-  geom_polygon(data=map.world.df, aes(x=long, y=lat, group=group), fill="white") +
-  geom_polygon(data=map.world.df, aes(x=long, y=lat, group=group, color=FINAL.CANINE.RABIES.STATUS,
-                                      fill=FINAL.CANINE.RABIES.STATUS), alpha=0.8) +
-  scale_fill_manual(name="Rabies Status", values = col_pal) +
-  scale_color_manual(name="Rabies Status", values = col_pal) +
-  coord_equal() +
+  geom_sf(data=map.world, fill="grey75", lwd=0.04, color=NA) + # colour="black",
+  geom_sf(data=map.world.df, fill="white") +
+  geom_sf(data=map.world.df, aes(color=FINAL.CANINE.RABIES.STATUS, fill=FINAL.CANINE.RABIES.STATUS), alpha=0.7) +
+  scale_fill_manual(name="Canine Rabies Status", values = col_pal_1) +
+  scale_color_manual(name="Canine Rabies Status", values = col_pal_1) +
+  coord_sf() +
   theme_void() +
   theme(legend.position = "top")
-ggsave("figs/paper/map.pdf", height=8, width=14)
+ggsave("figs/paper/map_red.pdf", height=8, width=14)
+ggplot() +
+  geom_sf(data=map.world, fill="grey75", lwd=0.04, color=NA) + # colour="black",
+  geom_sf(data=map.world.df, fill="white") +
+  geom_sf(data=map.world.df, aes(color=FINAL.CANINE.RABIES.STATUS, fill=FINAL.CANINE.RABIES.STATUS), alpha=0.7) +
+  scale_fill_manual(name="Canine Rabies Status", values = col_pal_2) +
+  scale_color_manual(name="Canine Rabies Status", values = col_pal_2) +
+  coord_sf() +
+  theme_void() +
+  theme(legend.position = "top")
+ggsave("figs/paper/map_trafficlight.pdf", height=8, width=14)
 
 #----- Produce initial stats ---------------------------------------------------
 
@@ -158,12 +127,13 @@ source("R/produce_initial_stats.R")
 
 # Set colours for different sectors
 sector_cols = c("vet"="#4080ff", "health"="#ffbf40", "surveillance"="#74e539")
+sector_labels = c("Vet", "Health", "Surveillance")
 
 # Barplot for reason mdv interupted
 cause_mdv_interuption_bp = cause_mdv_interuption %>%
   mutate(plot_groups = ifelse(question %in% c("no.staff.available", "restrictions.on.staff.movement"), "Staff restrictions",
                               ifelse(question %in% c("no.vaccines.available", "no.consumables.available"), "Supply issues",
-                                     ifelse(question %in% c("difficult.to.adhere.to.covid.guidelines", "people.afraid.of.leaving.home.gathering"), "Covid-based restrictions",
+                                     ifelse(question %in% c("difficult.to.adhere.to.covid.guidelines", "people.afraid.of.leaving.home.gathering"), "Covid-based \nrestrictions",
                                             ifelse(question == "increased.cost.of.organizing", "Budget issues",
                                                    ifelse(question == "other2", "Other", NA)))))) %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
@@ -172,27 +142,29 @@ cause_mdv_interuption_bp = cause_mdv_interuption %>%
   summarise(n = sum(n)) %>%
   mutate(p=(n/n_surveys)*100,
          type="vet") %>%
-  filter(!is.na(plot_groups))
-cause_mdv_interuption_bp$plot_groups <- factor(cause_mdv_interuption_bp$plot_groups,
-                                               levels=c("Staff restrictions", "Supply issues",
-                                                        "Covid-based restrictions", "Budget issues",
-                                                        "Other"))
+  filter(!is.na(plot_groups)) %>%
+  arrange(desc(p))
+cause_mdv_interuption_bp$plot_groups <- factor(cause_mdv_interuption_bp$plot_groups, levels=cause_mdv_interuption_bp$plot_groups)
+# cause_mdv_interuption_bp$plot_groups <- factor(cause_mdv_interuption_bp$plot_groups,
+#                                                levels=c("Staff restrictions", "Supply issues",
+#                                                         "Covid-based restrictions", "Budget issues",
+#                                                         "Other"))
 cause_mdv_interuption_bp$type <- factor(cause_mdv_interuption_bp$type,
                                         levels=c("vet", "health", "surveillance"))
 bp_1 = ggplot(data=cause_mdv_interuption_bp, aes(x=plot_groups, y=p, fill=type)) +
   geom_col() +
   labs(x="", y="Percentage of respondents") +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=sector_cols, drop=FALSE) +
+  scale_fill_manual(name="Sector: ", values=sector_cols, labels=sector_labels, drop=FALSE) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle=45, hjust=1, size=12), legend.title = element_blank()) # legend.position = "none",
+  theme(axis.text.x = element_text(angle=45, hjust=1, size=12)) #, legend.title = element_blank()) # legend.position = "none",
 bp_1
 
 # Barplot for disrutption to investigations
 cause_for_investigating_dis_bp = cause_for_investigating_dis %>%
   mutate(plot_groups = ifelse(question %in% c("no.staff.available.1", "restrictions.on.staff.movement.1"), "Staff restrictions",
                               ifelse(question %in% c("no.sample.collection.testing.kit.available"), "Supply issues",
-                                     ifelse(question %in% c("difficult.to.adhere.to.covid.guidelines.1", "investigators.not.welcomed.in.communities"), "Covid-based restrictions",
+                                     ifelse(question %in% c("difficult.to.adhere.to.covid.guidelines.1", "investigators.not.welcomed.in.communities"), "Covid-based \nrestrictions",
                                             ifelse(question == "no.budget", "Budget issues",
                                                    ifelse(question == "other7", "Other", NA)))))) %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
@@ -201,11 +173,13 @@ cause_for_investigating_dis_bp = cause_for_investigating_dis %>%
   summarise(n = sum(n)) %>%
   mutate(p=(n/n_surveys)*100,
          type="surveillance") %>%
-  filter(!is.na(plot_groups))
-cause_for_investigating_dis_bp$plot_groups <- factor(cause_for_investigating_dis_bp$plot_groups,
-                                                     levels=c("Staff restrictions", "Supply issues",
-                                                              "Covid-based restrictions", "Budget issues",
-                                                              "Other"))
+  filter(!is.na(plot_groups)) %>%
+  arrange(desc(p))
+cause_for_investigating_dis_bp$plot_groups <- factor(cause_for_investigating_dis_bp$plot_groups, levels=cause_for_investigating_dis_bp$plot_groups)
+# cause_for_investigating_dis_bp$plot_groups <- factor(cause_for_investigating_dis_bp$plot_groups,
+#                                                      levels=c("Staff restrictions", "Supply issues",
+#                                                               "Covid-based restrictions", "Budget issues",
+#                                                               "Other"))
 bp_2 = ggplot(data=cause_for_investigating_dis_bp, aes(x=plot_groups, y=p, fill=type)) +
   geom_col() +
   labs(x="", y="Percentage of respondents") +
@@ -219,19 +193,22 @@ bp_2
 change_in_health_seeking_bp = change_in_health_seeking %>%
   filter(question != "people.still.attending.clinics") %>%
   mutate(plot_groups = ifelse(question %in% c("people.have.called.toll.free.numbers", "people.have.relied.more.on.local.remedies", "wound.washing.has.increased"), "Reliance on \nalternative healthcare",
-                              ifelse(question %in% c("people.have.avoided.clinics.due.to.fear.of.covid", "people.have.delayed.going.to.clinics", "people.have.interrupted.pep"), "Avoidance of clinics",
-                                     ifelse(question %in% c("people.cannot.reach.clinics.because.of.reduced.public.transport", "people.cannot.afford.travel"), "Transport issues",
-                                            ifelse(question == "other8", "Other", NA))))) %>%
+                              ifelse(question %in% c("people.have.avoided.clinics.due.to.fear.of.covid", "people.have.delayed.going.to.clinics", "people.have.interrupted.pep"), "Avoidance \nof clinics",
+                                     ifelse(question %in% c("people.cannot.reach.clinics.because.of.reduced.public.transport"), "Transport issues",
+                                            ifelse(question %in% c("people.cannot.afford.travel"), "Budget issues",
+                                                   ifelse(question == "other8", "Other", NA)))))) %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
   summarise(n=length(unique(p.n.))) %>% # tally()
   group_by(n_surveys, n_NAs, plot_groups) %>%
   summarise(n = sum(n)) %>%
   mutate(p=(n/n_surveys)*100,
          type="health") %>%
-  filter(!is.na(plot_groups))
-change_in_health_seeking_bp$plot_groups <- factor(change_in_health_seeking_bp$plot_groups,
-                                                     levels=c("Avoidance of clinics", "Reliance on \nalternative healthcare",
-                                                              "Transport issues", "Other"))
+  filter(!is.na(plot_groups)) %>%
+  arrange(desc(p))
+change_in_health_seeking_bp$plot_groups <- factor(change_in_health_seeking_bp$plot_groups, levels=change_in_health_seeking_bp$plot_groups)
+# change_in_health_seeking_bp$plot_groups <- factor(change_in_health_seeking_bp$plot_groups,
+#                                                      levels=c("Avoidance of clinics", "Reliance on \nalternative healthcare",
+#                                                               "Transport issues", "Budget issues", "Other"))
 bp_3 = ggplot(data=change_in_health_seeking_bp, aes(x=plot_groups, y=p, fill=type)) +
   geom_col() +
   labs(x="", y="Percentage of respondents") +
@@ -245,7 +222,7 @@ bp_3
 change_in_pep_bp = change_in_pep %>%
   filter(question != "people.still.attending.clinics") %>%
   mutate(plot_groups = ifelse(question %in% c("staff.redeployed", "staff.reduced.due.to.quarantine"), "Staff restrictions",
-                              ifelse(question %in% c("staff.less.likely.to.recommend.pep", "follow.up.shots.delayed.cancelled"), "Change in PEP delivery",
+                              ifelse(question %in% c("staff.less.likely.to.recommend.pep", "follow.up.shots.delayed.cancelled"), "Change in PEP \ndelivery",
                                      ifelse(question %in% c("vaccines.out.of.stock.due.to.supply.issues", "vaccines.available.only.in.the.private.sector", "consumables.not.available", "rig.not.available"), "Supply issues",
                                             ifelse(question %in% c("vaccines.out.of.stock.because.of.financial.constraints"), "Budget issues",
                                                    ifelse(question == "other9", "Other", NA)))))) %>%
@@ -255,10 +232,12 @@ change_in_pep_bp = change_in_pep %>%
   summarise(n = sum(n)) %>%
   mutate(p=(n/n_surveys)*100,
          type="health") %>%
-  filter(!is.na(plot_groups))
-change_in_pep_bp$plot_groups <- factor(change_in_pep_bp$plot_groups,
-                                       levels=c("Staff restrictions", "Change in PEP delivery",
-                                                "Supply issues", "Budget issues", "Other"))
+  filter(!is.na(plot_groups)) %>%
+  arrange(desc(p))
+change_in_pep_bp$plot_groups <- factor(change_in_pep_bp$plot_groups, levels=change_in_pep_bp$plot_groups)
+# change_in_pep_bp$plot_groups <- factor(change_in_pep_bp$plot_groups,
+#                                        levels=c("Staff restrictions", "Change in PEP delivery",
+#                                                 "Supply issues", "Budget issues", "Other"))
 bp_4 = ggplot(data=change_in_pep_bp, aes(x=plot_groups, y=p, fill=type)) +
   geom_col() +
   labs(x="", y="Percentage of respondents") +
