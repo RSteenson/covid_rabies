@@ -219,7 +219,7 @@ bp_2
 change_in_health_seeking_bp = change_in_health_seeking %>%
   filter(question != "people.still.attending.clinics") %>%
   mutate(plot_groups = ifelse(question %in% c("people.have.called.toll.free.numbers", "people.have.relied.more.on.local.remedies", "wound.washing.has.increased"), "Reliance on \nalternative healthcare",
-                              ifelse(question %in% c("people.have.avoided.clinics.due.to.fear.of.covid", "people.have.delayed.going.to.clinics", "people.have.interrupted.pep"), "Avoidence of clinics",
+                              ifelse(question %in% c("people.have.avoided.clinics.due.to.fear.of.covid", "people.have.delayed.going.to.clinics", "people.have.interrupted.pep"), "Avoidance of clinics",
                                      ifelse(question %in% c("people.cannot.reach.clinics.because.of.reduced.public.transport", "people.cannot.afford.travel"), "Transport issues",
                                             ifelse(question == "other8", "Other", NA))))) %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
@@ -230,7 +230,7 @@ change_in_health_seeking_bp = change_in_health_seeking %>%
          type="health") %>%
   filter(!is.na(plot_groups))
 change_in_health_seeking_bp$plot_groups <- factor(change_in_health_seeking_bp$plot_groups,
-                                                     levels=c("Avoidence of clinics", "Reliance on \nalternative healthcare",
+                                                     levels=c("Avoidance of clinics", "Reliance on \nalternative healthcare",
                                                               "Transport issues", "Other"))
 bp_3 = ggplot(data=change_in_health_seeking_bp, aes(x=plot_groups, y=p, fill=type)) +
   geom_col() +
