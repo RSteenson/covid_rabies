@@ -311,31 +311,31 @@ source("R/process_yes_no.R")
 # Produce maps, and save as individual files
 budget_divert_map = point_map(dataframe=budget_divert_centroids,
                               map_title="Was the budget for rabies \nprevention/control reduced/diverted?")
-ggsave("figs/paper/map_budget_divert.pdf", width=10, height=6)
+ggsave("figs/paper/individual_point_maps/map_budget_divert.pdf", width=10, height=6)
 mdv_map = point_map(dataframe=mdv_centroids,
                     map_title="Was MDV carried out in 2020?")
-ggsave("figs/paper/map_mdv_happened.pdf", width=10, height=6)
+ggsave("figs/paper/individual_point_maps/map_mdv_happened.pdf", width=10, height=6)
 arv_demand_map = point_map(dataframe=increased_arv_demand_centroids,
                     map_title="Have vets experienced higher demand for ARV?")
-ggsave("figs/paper/map_vet_arv_demand.pdf", width=10, height=6)
+ggsave("figs/paper/individual_point_maps/map_vet_arv_demand.pdf", width=10, height=6)
 arv_supply_map = point_map(dataframe=arv_supply_centroids,
                            map_title="Has ARV production/supply been affected?")
-ggsave("figs/paper/map_vet_arv_supply.pdf", width=10, height=6)
+ggsave("figs/paper/individual_point_maps/map_vet_arv_supply.pdf", width=10, height=6)
 staff_redeployed_map = point_map(dataframe=staff_redeployed_centroids,
                            map_title="Were surveillance staff redeployed?")
-ggsave("figs/paper/map_surv_staff_redeployed.pdf", width=10, height=6)
+ggsave("figs/paper/individual_point_maps/map_surv_staff_redeployed.pdf", width=10, height=6)
 lab_capacity_map = point_map(dataframe=lab_capacity_centroids,
                                  map_title="Was lab capacity reduced/diverted?")
-ggsave("figs/paper/map_lab_capacity.pdf", width=10, height=6)
+ggsave("figs/paper/individual_point_maps/map_lab_capacity.pdf", width=10, height=6)
 health_seeking_map = point_map(dataframe=health_seeking_centroids,
                              map_title="Were there changes in health seeking behaviour?")
-ggsave("figs/paper/map_health_seeking.pdf", width=10, height=6)
+ggsave("figs/paper/individual_point_maps/map_health_seeking.pdf", width=10, height=6)
 dog_bite_guidance_map = point_map(dataframe=dog_bite_guidance_centroids,
                                map_title="Have dog bites been mentioned in \npublic guidance during the pandemic?")
-ggsave("figs/paper/map_bite_guidance.pdf", width=10, height=6)
+ggsave("figs/paper/individual_point_maps/map_bite_guidance.pdf", width=10, height=6)
 wrd_impact_map = point_map(dataframe=wrd_impact_centroids,
                            map_title="Were WRD events impacted in 2020?")
-ggsave("figs/paper/map_wrd_events.pdf", width=10, height=6)
+ggsave("figs/paper/individual_point_maps/map_wrd_events.pdf", width=10, height=6)
 
 # Produce combined map (panelled currently)
 ggarrange(budget_divert_map, mdv_map, arv_demand_map,
