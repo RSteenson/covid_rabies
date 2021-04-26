@@ -46,8 +46,8 @@ ggplot(data=mdv_happened_2020_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIE
        subtitle=paste0("Responded: ", unique(mdv_happened_2020_plot$n_surveys),
                        "; No answer: ", unique(mdv_happened_2020_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
-  scale_color_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
+  scale_color_manual(values=col_pal_1) +
   scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
@@ -102,7 +102,7 @@ ggplot(data=cause_mdv_interuption_plot, aes(x=question, y=p, fill=FINAL.CANINE.R
        subtitle=paste0("Responded: ", unique(cause_mdv_interuption_plot$n_surveys),
                        "; No answer: ", unique(cause_mdv_interuption_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q2_reason_mdv_interupted.pdf", height=7, width=8)
@@ -150,7 +150,7 @@ ggplot(data=mdv_method_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.STATU
        subtitle=paste0("Responded: ", unique(mdv_method_plot$n_surveys),
                        "; No answer: ", unique(mdv_method_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q3_mdv_method.pdf", height=7, width=8)
@@ -201,8 +201,8 @@ ggplot(data=impact_on_vaccine_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIE
        subtitle=paste0("Responded: ", unique(impact_on_vaccine_plot$n_surveys),
                        "; No answer: ", unique(impact_on_vaccine_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
-  scale_color_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
+  scale_color_manual(values=col_pal_1) +
   scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
@@ -252,8 +252,8 @@ ggplot(data=change_in_dog_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.ST
        subtitle=paste0("Responded: ", unique(change_in_dog_plot$n_surveys),
                        "; No answer: ", unique(change_in_dog_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
-  scale_color_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
+  scale_color_manual(values=col_pal_1) +
   scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
@@ -305,7 +305,7 @@ ggplot(data=change_in_interaction_plot, aes(x=question, y=p, fill=FINAL.CANINE.R
        subtitle=paste0("Responded: ", unique(change_in_interaction_plot$n_surveys),
                        "; No answer: ", unique(change_in_interaction_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q6_change_in_human_frds_interactions.pdf", height=7, width=8)
@@ -356,7 +356,7 @@ ggplot(data=cause_for_investigating_dis_plot, aes(x=question, y=p, fill=FINAL.CA
        subtitle=paste0("Responded: ", unique(cause_for_investigating_dis_plot$n_surveys),
                        "; No answer: ", unique(cause_for_investigating_dis_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q7_reason_for_investigating_reporting.pdf", height=7, width=8)
@@ -410,8 +410,8 @@ ggplot(data=change_in_health_seeking_plot, aes(x=question, y=p, fill=FINAL.CANIN
        subtitle=paste0("Responded: ", unique(change_in_health_seeking_plot$n_surveys),
                        "; No answer: ", unique(change_in_health_seeking_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
-  scale_color_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
+  scale_color_manual(values=col_pal_1) +
   scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
@@ -465,7 +465,7 @@ ggplot(data=change_in_pep_plot, aes(x=question, y=p, fill=FINAL.CANINE.RABIES.ST
        subtitle=paste0("Responded: ", unique(change_in_pep_plot$n_surveys),
                        "; No answer: ", unique(change_in_pep_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
 ggsave("figs/q9_changes_in_pep.pdf", height=7, width=8)
@@ -515,8 +515,8 @@ ggplot(data=change_in_frds_media_plot, aes(x=question, y=p, fill=FINAL.CANINE.RA
        subtitle=paste0("Responded: ", unique(change_in_frds_media_plot$n_surveys),
                        "; No answer: ", unique(change_in_frds_media_plot$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
-  scale_color_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
+  scale_color_manual(values=col_pal_1) +
   scale_alpha_manual(values=alph_pal, guide=FALSE) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1), legend.title = element_blank())
@@ -653,7 +653,7 @@ ggplot(data=animal_deaths, aes(x=question, y=p)) +
        subtitle=paste0("Responded: ", unique(animal_deaths$n_surveys),
                        "; No answer: ", unique(animal_deaths$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
 ggsave("figs/q11_animal_deaths.pdf", height=7, width=8)
@@ -677,7 +677,7 @@ ggplot(data=animal_bites, aes(x=question, y=p)) +
        subtitle=paste0("Responded: ", unique(animal_bites$n_surveys),
                        "; No answer: ", unique(animal_bites$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
 ggsave("figs/q12_animal_bites.pdf", height=7, width=8)
@@ -701,7 +701,7 @@ ggplot(data=human_deaths, aes(x=question, y=p)) +
        subtitle=paste0("Responded: ", unique(human_deaths$n_surveys),
                        "; No answer: ", unique(human_deaths$n_NAs))) +
   scale_y_continuous(limits=c(0, 100)) +
-  scale_fill_manual(values=col_pal) +
+  scale_fill_manual(values=col_pal_1) +
   theme_classic() +
   theme(legend.position = "top", axis.text.x = element_text(angle=45, hjust=1))
 ggsave("figs/q13_human_deaths.pdf", height=7, width=8)

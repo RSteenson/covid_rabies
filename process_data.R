@@ -263,15 +263,15 @@ map_sf = st_as_sf(map.world.df, coords=c("long", "lat"))
 
 # Extract country centroids
 map_centroids = map_sf %>%
-   group_by(region) %>%
+  group_by(CNTRY_TERR) %>%
   summarise() %>%
   st_centroid()
 
 # Create base map
 base_map = ggplot() +
-  geom_polygon(data=map.world, aes(x=long, y=lat, group=group),
-               fill="grey75", lwd=0.04) +
-  geom_polygon(data=map.world.df, aes(x=long, y=lat, group=group),
+  geom_sf(data=map.world, #, aes(x=long, y=lat, group=group),
+               fill="grey75", color=NA, lwd=0.04) +
+  geom_sf(data=map.world.df, #, aes(x=long, y=lat, group=group),
                fill="grey50", color="grey35", lwd=0.04) +
   coord_sf() +
   theme_void()
@@ -289,31 +289,31 @@ source("R/process_yes_no.R")
 
 # Produce maps, and save as individual files
 budget_divert_map = point_map(dataframe=budget_divert_centroids,
-                              map_title="Was the budget for rabies \nprevention/control reduced/diverted?")
+                              map_title="Rabies budget reduced/diverted")
 ggsave("figs/paper/individual_point_maps/map_budget_divert.pdf", width=10, height=6)
 mdv_map = point_map(dataframe=mdv_centroids,
-                    map_title="Was MDV carried out in 2020?")
+                    map_title="Dog vaccination campaign disrupted")
 ggsave("figs/paper/individual_point_maps/map_mdv_happened.pdf", width=10, height=6)
 arv_demand_map = point_map(dataframe=increased_arv_demand_centroids,
-                    map_title="Have vets experienced higher demand for ARV?")
+                    map_title="Vets experienced higher demand for ARV")
 ggsave("figs/paper/individual_point_maps/map_vet_arv_demand.pdf", width=10, height=6)
 arv_supply_map = point_map(dataframe=arv_supply_centroids,
-                           map_title="Has ARV production/supply been affected?")
+                           map_title="Dog vaccine production/supply affected")
 ggsave("figs/paper/individual_point_maps/map_vet_arv_supply.pdf", width=10, height=6)
 staff_redeployed_map = point_map(dataframe=staff_redeployed_centroids,
-                           map_title="Were surveillance staff redeployed?")
+                           map_title="Surveillance staff redeployed")
 ggsave("figs/paper/individual_point_maps/map_surv_staff_redeployed.pdf", width=10, height=6)
 lab_capacity_map = point_map(dataframe=lab_capacity_centroids,
-                                 map_title="Was lab capacity reduced/diverted?")
+                                 map_title="Lab capacity reduced/diverted")
 ggsave("figs/paper/individual_point_maps/map_lab_capacity.pdf", width=10, height=6)
 health_seeking_map = point_map(dataframe=health_seeking_centroids,
-                             map_title="Were there changes in health seeking behaviour?")
+                             map_title="Altered health seeking behaviour?")
 ggsave("figs/paper/individual_point_maps/map_health_seeking.pdf", width=10, height=6)
 dog_bite_guidance_map = point_map(dataframe=dog_bite_guidance_centroids,
-                               map_title="Have dog bites been mentioned in \npublic guidance during the pandemic?")
+                               map_title="Dog bites mentioned in public guidance?")
 ggsave("figs/paper/individual_point_maps/map_bite_guidance.pdf", width=10, height=6)
 wrd_impact_map = point_map(dataframe=wrd_impact_centroids,
-                           map_title="Were WRD events impacted in 2020?")
+                           map_title="WRD events impacted")
 ggsave("figs/paper/individual_point_maps/map_wrd_events.pdf", width=10, height=6)
 
 # Produce combined map (panelled currently)
@@ -321,4 +321,12 @@ ggarrange(budget_divert_map, mdv_map, arv_demand_map,
           arv_supply_map, staff_redeployed_map, lab_capacity_map,
           health_seeking_map, dog_bite_guidance_map, wrd_impact_map,
           ncol=3, nrow=3, common.legend = TRUE)
-ggsave("figs/paper/combined_map.pdf", width=15, height=9)
+ggsave("figs/paper/combined_map_V1.pdf", width=15, height=9)
+
+# Produce reduced combined map
+combined_surv_map = point_map(dataframe=combined_surv_centroids,
+                           map_title="Surveillance staff redeployed, or lab capacity reduced")
+ggarrange(budget_divert_map, mdv_map, arv_supply_map, combined_surv_map,
+          health_seeking_map,
+          ncol=2, nrow=3, common.legend = TRUE)
+ggsave("figs/paper/combined_map_V2.pdf", width=15, height=9)

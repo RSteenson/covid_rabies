@@ -49,7 +49,7 @@ rabies_budget_diverted_proc = rabies_budget_diverted_proc %>%
 
 # Merge into centroid data
 budget_divert_centroids = map_centroids %>%
-  merge(., rabies_budget_diverted_proc, by.x="region", by.y="country", all.x=TRUE) %>%
+  merge(., rabies_budget_diverted_proc, by.x="CNTRY_TERR", by.y="country", all.x=TRUE) %>%
   filter(!is.na(col))
 
 #----- 8. Was MDV carried out? -------------------------------------------------
@@ -72,7 +72,7 @@ mdv_carried_out_proc = mdv_carried_out_proc %>%
 
 # Merge into centroid data
 mdv_centroids = map_centroids %>%
-  merge(., mdv_carried_out_proc, by.x="region", by.y="country", all.x=TRUE) %>%
+  merge(., mdv_carried_out_proc, by.x="CNTRY_TERR", by.y="country", all.x=TRUE) %>%
   filter(!is.na(col))
 
 #----- 14. Have vets experienced higher demand for ARV? ------------------------
@@ -93,7 +93,7 @@ increased_arv_demand_proc = increased_arv_demand_proc %>%
 
 # Merge into centroid data
 increased_arv_demand_centroids = map_centroids %>%
-  merge(., increased_arv_demand_proc, by.x="region", by.y="country", all.x=TRUE) %>%
+  merge(., increased_arv_demand_proc, by.x="CNTRY_TERR", by.y="country", all.x=TRUE) %>%
   filter(!is.na(col))
 
 #----- 15. Has the pandemic affected ARV production/supply chain? --------------
@@ -116,7 +116,7 @@ arv_supply_proc = arv_supply_proc %>%
 
 # Merge into centroid data
 arv_supply_centroids = map_centroids %>%
-  merge(., arv_supply_proc, by.x="region", by.y="country", all.x=TRUE) %>%
+  merge(., arv_supply_proc, by.x="CNTRY_TERR", by.y="country", all.x=TRUE) %>%
   filter(!is.na(col))
 
 #----- 18. Have staff for rabies surveillance been reallocated? ----------------
@@ -138,7 +138,7 @@ staff_redeployed_proc = staff_redeployed_proc %>%
 
 # Merge into centroid data
 staff_redeployed_centroids = map_centroids %>%
-  merge(., staff_redeployed_proc, by.x="region", by.y="country", all.x=TRUE) %>%
+  merge(., staff_redeployed_proc, by.x="CNTRY_TERR", by.y="country", all.x=TRUE) %>%
   filter(!is.na(col))
 
 #----- 19. Has lab capacity been reduced/diverted? ----------------------------
@@ -159,7 +159,7 @@ lab_capacity_proc = lab_capacity_proc %>%
 
 # Merge into centroid data
 lab_capacity_centroids = map_centroids %>%
-  merge(., lab_capacity_proc, by.x="region", by.y="country", all.x=TRUE) %>%
+  merge(., lab_capacity_proc, by.x="CNTRY_TERR", by.y="country", all.x=TRUE) %>%
   filter(!is.na(col))
 
 #----- 24. Has health seeking behaviour changed? -------------------------------
@@ -182,10 +182,10 @@ change_health_seeking_proc = change_health_seeking_proc %>%
 
 # Merge into centroid data
 health_seeking_centroids = map_centroids %>%
-  merge(., change_health_seeking_proc, by.x="region", by.y="country", all.x=TRUE) %>%
+  merge(., change_health_seeking_proc, by.x="CNTRY_TERR", by.y="country", all.x=TRUE) %>%
   filter(!is.na(col))
 
-#----- 28. Have dog bites been mentioned in public guidance during pandemic? ---
+#----- 28. Have dog bites been mentioned in public guidance during pandemic? ----
 dog_bite_guidance = survey_data %>%
   group_by(country, "impacted"=dog.bites.in.medical.emergency.guidelines) %>%
   tally()
@@ -203,7 +203,7 @@ dog_bite_guidance_proc = dog_bite_guidance_proc %>%
 
 # Merge into centroid data
 dog_bite_guidance_centroids = map_centroids %>%
-  merge(., dog_bite_guidance_proc, by.x="region", by.y="country", all.x=TRUE) %>%
+  merge(., dog_bite_guidance_proc, by.x="CNTRY_TERR", by.y="country", all.x=TRUE) %>%
   filter(!is.na(col))
 
 #----- 30. Were WRD events affected? -------------------------------------------
@@ -229,5 +229,30 @@ wrd_impact_proc = wrd_impact_proc %>%
 
 # Merge into centroid data
 wrd_impact_centroids = map_centroids %>%
-  merge(., wrd_impact_proc, by.x="region", by.y="country", all.x=TRUE) %>%
+  merge(., wrd_impact_proc, by.x="CNTRY_TERR", by.y="country", all.x=TRUE) %>%
+  filter(!is.na(col))
+
+#----- Combined surveillance staff redeployment & reduced lab capacity ---------
+
+combined_surv = staff_redeployed %>%
+  merge(., lab_capacity, by="country") %>%
+  group_by(country) %>%
+  mutate("impacted" = ifelse(impacted.x=="Yes" | impacted.y=="Yes", "Yes", "No"),
+         "n" = max(c(n.x, n.y))) %>%
+  dplyr:: select(country, impacted, n)
+
+# Use function to remove multiple responses from the same country
+combined_surv_proc = rm_multi_response(combined_surv)
+
+# Add formatting for map plot
+combined_surv_proc = combined_surv_proc %>%
+  mutate(col = ifelse(is.na(impacted), "none",
+                      ifelse(impacted == "Yes", "surveillance", "empty")),
+         shap = ifelse(is.na(impacted), "cross", "circle")) %>%
+  dplyr::select(country, col, shap) %>%
+  unique()
+
+# Merge into centroid data
+combined_surv_centroids = map_centroids %>%
+  merge(., combined_surv_proc, by.x="CNTRY_TERR", by.y="country", all.x=TRUE) %>%
   filter(!is.na(col))

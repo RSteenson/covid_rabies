@@ -1,12 +1,15 @@
 point_map = function(map_bg = base_map, dataframe, map_title){
 
+  # Remove "none"
+  dataframe = dataframe[which(dataframe$col != "none"),]
+
   # Set column as factor
   dataframe$col <- factor(dataframe$col,
-                          levels=c("vet", "health", "surveillance", "cross-sectoral", "empty", "none"))
+                          levels=c("vet", "health", "surveillance", "cross-sectoral", "empty")) #, "none"))
 
   # Set map point colours and shapes
   col_pal = c("circle"="black", "cross"="red")
-  fill_pal = c(sector_cols, "cross-sectoral"="black", "empty"="white", "none"="red")
+  fill_pal = c(sector_cols, "cross-sectoral"="black", "empty"="white") #, "none"="red")
   shap_pal = c("circle"=21, "cross"=4)
 
   # Update base map appearence
@@ -20,6 +23,6 @@ point_map = function(map_bg = base_map, dataframe, map_title){
   # Add points to map
   basic_map + geom_sf(data=dataframe,
                       aes(fill=col, color=shap, shape=shap),
-                      stroke=1, size=2) +
+                      stroke=0.7, size=2) +
           ggtitle(map_title)
   }
