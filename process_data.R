@@ -307,7 +307,7 @@ lab_capacity_map = point_map(dataframe=lab_capacity_centroids,
                                  map_title="Lab capacity reduced/diverted")
 ggsave("figs/paper/individual_point_maps/map_lab_capacity.pdf", width=10, height=6)
 health_seeking_map = point_map(dataframe=health_seeking_centroids,
-                             map_title="Altered health seeking behaviour?")
+                             map_title="Altered health seeking behaviour")
 ggsave("figs/paper/individual_point_maps/map_health_seeking.pdf", width=10, height=6)
 dog_bite_guidance_map = point_map(dataframe=dog_bite_guidance_centroids,
                                map_title="Dog bites mentioned in public guidance?")
