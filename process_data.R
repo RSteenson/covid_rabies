@@ -8,6 +8,7 @@ library(tidyverse)
 devtools::install_github("dcooley/sfheaders")
 library(sfheaders)
 library(ggpubr)
+library(ggnewscale)
 
 options(stringsAsFactors=FALSE,
         dplyr.summarise.inform = FALSE)
@@ -43,8 +44,8 @@ survey_data = read.csv("data/Survey_data.csv")
 map.world = read_sf("data/WHO Map boundaries/MapTemplate_detailed_2013/Shapefiles/detailed_2013.shp")
 
 # Create colour and alpha palette
-col_pal_1 = c("Endemic"="red2", "Controlled"="#ff6666", "Not endemic"="grey35", "Global"="dimgrey")
-col_pal_2 = c("Endemic"="firebrick2", "Controlled"="#E69F00", "Not endemic"="#18ca08", "Global"="dimgrey")
+# col_pal_1 = c("Endemic"="red2", "Controlled"="#ff6666", "Not endemic"="grey35", "Global"="dimgrey")
+col_pal_2 = c("Endemic"="firebrick2", "Controlled"="#E69F00", "Not endemic"="dimgrey", "Global"="dimgrey")
 alph_pal = c("positive"=1, "negative"=0.1)
 
 #----- Initial data processing -------------------------------------------------
@@ -98,26 +99,27 @@ map.world.df <- map.world %>%
 #----- Produce map -------------------------------------------------------------
 
 # Plot map
-ggplot() +
+# ggplot() +
+#   geom_sf(data=map.world, fill="grey75", lwd=0.04, color=NA) + # colour="black",
+#   geom_sf(data=map.world.df, fill="white") +
+#   geom_sf(data=map.world.df, aes(color=FINAL.CANINE.RABIES.STATUS, fill=FINAL.CANINE.RABIES.STATUS), alpha=0.7) +
+#   scale_fill_manual(name="Canine Rabies Status", values = col_pal_1) +
+#   scale_color_manual(name="Canine Rabies Status", values = col_pal_1) +
+#   coord_sf() +
+#   theme_void() +
+#   theme(legend.position = "top")
+# ggsave("figs/paper/map_red.pdf", height=8, width=14)
+status = ggplot() +
   geom_sf(data=map.world, fill="grey75", lwd=0.04, color=NA) + # colour="black",
   geom_sf(data=map.world.df, fill="white") +
   geom_sf(data=map.world.df, aes(color=FINAL.CANINE.RABIES.STATUS, fill=FINAL.CANINE.RABIES.STATUS), alpha=0.7) +
-  scale_fill_manual(name="Canine Rabies Status", values = col_pal_1) +
-  scale_color_manual(name="Canine Rabies Status", values = col_pal_1) +
+  scale_fill_manual(name="Canine Rabies Status", values = col_pal_2, guide=guide_legend(order=1)) +
+  scale_color_manual(name="Canine Rabies Status", values = col_pal_2, guide=guide_legend(order=1)) +
   coord_sf() +
   theme_void() +
   theme(legend.position = "top")
-ggsave("figs/paper/map_red.pdf", height=8, width=14)
-ggplot() +
-  geom_sf(data=map.world, fill="grey75", lwd=0.04, color=NA) + # colour="black",
-  geom_sf(data=map.world.df, fill="white") +
-  geom_sf(data=map.world.df, aes(color=FINAL.CANINE.RABIES.STATUS, fill=FINAL.CANINE.RABIES.STATUS), alpha=0.7) +
-  scale_fill_manual(name="Canine Rabies Status", values = col_pal_2) +
-  scale_color_manual(name="Canine Rabies Status", values = col_pal_2) +
-  coord_sf() +
-  theme_void() +
-  theme(legend.position = "top")
-ggsave("figs/paper/map_trafficlight.pdf", height=8, width=14)
+status
+ggsave("figs/paper/map_endemic_status.pdf", height=8, width=14)
 
 #----- Produce initial stats ---------------------------------------------------
 
@@ -131,10 +133,10 @@ sector_labels = c("Vet", "Health", "Surveillance")
 
 # Barplot for reason mdv interupted
 cause_mdv_interuption_bp = cause_mdv_interuption %>%
-  mutate(plot_groups = ifelse(question %in% c("no.staff.available", "restrictions.on.staff.movement"), "Staff restrictions",
-                              ifelse(question %in% c("no.vaccines.available", "no.consumables.available"), "Supply issues",
-                                     ifelse(question %in% c("difficult.to.adhere.to.covid.guidelines", "people.afraid.of.leaving.home.gathering"), "Covid-based \nrestrictions",
-                                            ifelse(question == "increased.cost.of.organizing", "Budget issues",
+  mutate(plot_groups = ifelse(question %in% c("no.staff.available", "restrictions.on.staff.movement"), "Movement \nrestrictions",
+                              ifelse(question %in% c("no.vaccines.available", "no.consumables.available"), "Supply \nissues",
+                                     ifelse(question %in% c("difficult.to.adhere.to.covid.guidelines", "people.afraid.of.leaving.home.gathering"), "COVID safety \nmeasures",
+                                            ifelse(question == "increased.cost.of.organizing", "Budget \nconstraints",
                                                    ifelse(question == "other2", "Other", NA)))))) %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
   summarise(n=length(unique(p.n.))) %>% # tally()
@@ -162,10 +164,10 @@ bp_1
 
 # Barplot for disrutption to investigations
 cause_for_investigating_dis_bp = cause_for_investigating_dis %>%
-  mutate(plot_groups = ifelse(question %in% c("no.staff.available.1", "restrictions.on.staff.movement.1"), "Staff restrictions",
-                              ifelse(question %in% c("no.sample.collection.testing.kit.available"), "Supply issues",
-                                     ifelse(question %in% c("difficult.to.adhere.to.covid.guidelines.1", "investigators.not.welcomed.in.communities"), "Covid-based \nrestrictions",
-                                            ifelse(question == "no.budget", "Budget issues",
+  mutate(plot_groups = ifelse(question %in% c("no.staff.available.1", "restrictions.on.staff.movement.1"), "Movement \nrestrictions",
+                              ifelse(question %in% c("no.sample.collection.testing.kit.available"), "Supply \nissues",
+                                     ifelse(question %in% c("difficult.to.adhere.to.covid.guidelines.1", "investigators.not.welcomed.in.communities"), "COVID safety \nmeasures",
+                                            ifelse(question == "no.budget", "Budget \nconstraints",
                                                    ifelse(question == "other7", "Other", NA)))))) %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
   summarise(n=length(unique(p.n.))) %>% # tally()
@@ -192,10 +194,10 @@ bp_2
 # Barplot for changes in health seeking behaviour
 change_in_health_seeking_bp = change_in_health_seeking %>%
   filter(question != "people.still.attending.clinics") %>%
-  mutate(plot_groups = ifelse(question %in% c("people.have.called.toll.free.numbers", "people.have.relied.more.on.local.remedies", "wound.washing.has.increased"), "Reliance on \nalternative healthcare",
-                              ifelse(question %in% c("people.have.avoided.clinics.due.to.fear.of.covid", "people.have.delayed.going.to.clinics", "people.have.interrupted.pep"), "Avoidance \nof clinics",
-                                     ifelse(question %in% c("people.cannot.reach.clinics.because.of.reduced.public.transport"), "Transport issues",
-                                            ifelse(question %in% c("people.cannot.afford.travel"), "Budget issues",
+  mutate(plot_groups = ifelse(question %in% c("people.have.called.toll.free.numbers", "people.have.relied.more.on.local.remedies", "wound.washing.has.increased"), "Alternative \nmedicine",
+                              ifelse(question %in% c("people.have.avoided.clinics.due.to.fear.of.covid", "people.have.delayed.going.to.clinics", "people.have.interrupted.pep"), "Avoided \nclinics",
+                                     ifelse(question %in% c("people.cannot.reach.clinics.because.of.reduced.public.transport"), "Transport \nissues",
+                                            ifelse(question %in% c("people.cannot.afford.travel"), "Costs",
                                                    ifelse(question == "other8", "Other", NA)))))) %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
   summarise(n=length(unique(p.n.))) %>% # tally()
@@ -221,10 +223,10 @@ bp_3
 # Barplot for disruption to PEP
 change_in_pep_bp = change_in_pep %>%
   filter(question != "people.still.attending.clinics") %>%
-  mutate(plot_groups = ifelse(question %in% c("staff.redeployed", "staff.reduced.due.to.quarantine"), "Staff restrictions",
-                              ifelse(question %in% c("staff.less.likely.to.recommend.pep", "follow.up.shots.delayed.cancelled"), "Change in PEP \ndelivery",
-                                     ifelse(question %in% c("vaccines.out.of.stock.due.to.supply.issues", "vaccines.available.only.in.the.private.sector", "consumables.not.available", "rig.not.available"), "Supply issues",
-                                            ifelse(question %in% c("vaccines.out.of.stock.because.of.financial.constraints"), "Budget issues",
+  mutate(plot_groups = ifelse(question %in% c("staff.redeployed", "staff.reduced.due.to.quarantine"), "Movement \nrestrictions",
+                              ifelse(question %in% c("staff.less.likely.to.recommend.pep", "follow.up.shots.delayed.cancelled"), "Change in PEP \nadministration",
+                                     ifelse(question %in% c("vaccines.out.of.stock.due.to.supply.issues", "vaccines.available.only.in.the.private.sector", "consumables.not.available", "rig.not.available"), "Supply \nissues",
+                                            ifelse(question %in% c("vaccines.out.of.stock.because.of.financial.constraints"), "Budget \nconstraints",
                                                    ifelse(question == "other9", "Other", NA)))))) %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
   summarise(n=length(unique(p.n.))) %>% # tally()
@@ -290,43 +292,64 @@ source("R/process_yes_no.R")
 # Produce maps, and save as individual files
 budget_divert_map = point_map(dataframe=budget_divert_centroids,
                               map_title="Rabies budget reduced/diverted")
-ggsave("figs/paper/individual_point_maps/map_budget_divert.pdf", width=10, height=6)
+# ggsave("figs/paper/individual_point_maps/map_budget_divert.pdf", width=10, height=6)
 mdv_map = point_map(dataframe=mdv_centroids,
-                    map_title="Dog vaccination campaign disrupted")
-ggsave("figs/paper/individual_point_maps/map_mdv_happened.pdf", width=10, height=6)
-arv_demand_map = point_map(dataframe=increased_arv_demand_centroids,
-                    map_title="Vets experienced higher demand for ARV")
-ggsave("figs/paper/individual_point_maps/map_vet_arv_demand.pdf", width=10, height=6)
+                    map_title="Dog vaccination campaigns disrupted")
+# ggsave("figs/paper/individual_point_maps/map_mdv_happened.pdf", width=10, height=6)
+# arv_demand_map = point_map(dataframe=increased_arv_demand_centroids,
+#                     map_title="Vets experienced higher demand for ARV")
+# ggsave("figs/paper/individual_point_maps/map_vet_arv_demand.pdf", width=10, height=6)
 arv_supply_map = point_map(dataframe=arv_supply_centroids,
                            map_title="Dog vaccine production/supply affected")
-ggsave("figs/paper/individual_point_maps/map_vet_arv_supply.pdf", width=10, height=6)
+# ggsave("figs/paper/individual_point_maps/map_vet_arv_supply.pdf", width=10, height=6)
 staff_redeployed_map = point_map(dataframe=staff_redeployed_centroids,
                            map_title="Surveillance staff redeployed")
-ggsave("figs/paper/individual_point_maps/map_surv_staff_redeployed.pdf", width=10, height=6)
-lab_capacity_map = point_map(dataframe=lab_capacity_centroids,
-                                 map_title="Lab capacity reduced/diverted")
-ggsave("figs/paper/individual_point_maps/map_lab_capacity.pdf", width=10, height=6)
+# ggsave("figs/paper/individual_point_maps/map_surv_staff_redeployed.pdf", width=10, height=6)
+# lab_capacity_map = point_map(dataframe=lab_capacity_centroids,
+#                                  map_title="Lab capacity reduced/diverted")
+# ggsave("figs/paper/individual_point_maps/map_lab_capacity.pdf", width=10, height=6)
 health_seeking_map = point_map(dataframe=health_seeking_centroids,
-                             map_title="Altered health seeking behaviour")
-ggsave("figs/paper/individual_point_maps/map_health_seeking.pdf", width=10, height=6)
-dog_bite_guidance_map = point_map(dataframe=dog_bite_guidance_centroids,
-                               map_title="Dog bites mentioned in public guidance?")
-ggsave("figs/paper/individual_point_maps/map_bite_guidance.pdf", width=10, height=6)
-wrd_impact_map = point_map(dataframe=wrd_impact_centroids,
-                           map_title="WRD events impacted")
-ggsave("figs/paper/individual_point_maps/map_wrd_events.pdf", width=10, height=6)
+                             map_title="Health seeking behaviour affected")
+# ggsave("figs/paper/individual_point_maps/map_health_seeking.pdf", width=10, height=6)
+# dog_bite_guidance_map = point_map(dataframe=dog_bite_guidance_centroids,
+#                                map_title="Dog bites mentioned in public guidance?")
+# ggsave("figs/paper/individual_point_maps/map_bite_guidance.pdf", width=10, height=6)
+# wrd_impact_map = point_map(dataframe=wrd_impact_centroids,
+#                            map_title="WRD events impacted")
+# ggsave("figs/paper/individual_point_maps/map_wrd_events.pdf", width=10, height=6)
 
 # Produce combined map (panelled currently)
-ggarrange(budget_divert_map, mdv_map, arv_demand_map,
-          arv_supply_map, staff_redeployed_map, lab_capacity_map,
-          health_seeking_map, dog_bite_guidance_map, wrd_impact_map,
-          ncol=3, nrow=3, common.legend = TRUE)
-ggsave("figs/paper/combined_map_V1.pdf", width=15, height=9)
+# ggarrange(budget_divert_map, mdv_map, arv_demand_map,
+#           arv_supply_map, staff_redeployed_map, lab_capacity_map,
+#           health_seeking_map, dog_bite_guidance_map, wrd_impact_map,
+#           ncol=3, nrow=3, common.legend = TRUE)
+# ggsave("figs/paper/combined_map_V1.pdf", width=15, height=9)
 
 # Produce reduced combined map
-combined_surv_map = point_map(dataframe=combined_surv_centroids,
-                           map_title="Surveillance staff redeployed, or lab capacity reduced")
-ggarrange(budget_divert_map, mdv_map, arv_supply_map, combined_surv_map,
-          health_seeking_map,
+# combined_surv_map = point_map(dataframe=combined_surv_centroids,
+#                            map_title="Surveillance staff redeployed, or lab capacity reduced")
+# ggarrange(budget_divert_map, mdv_map, arv_supply_map, combined_surv_map,
+#           health_seeking_map,
+#           ncol=2, nrow=3, common.legend = TRUE)
+# ggsave("figs/paper/combined_map_V2.pdf", width=15, height=9)
+
+# Produce reduced combined map
+ggarrange(budget_divert_map, mdv_map, arv_supply_map, staff_redeployed_map, health_seeking_map,
           ncol=2, nrow=3, common.legend = TRUE)
-ggsave("figs/paper/combined_map_V2.pdf", width=15, height=9)
+ggsave("figs/paper/combined_map_1.pdf", width=14, height=9)
+
+# Combine map with endemic status
+point_dummy <- health_seeking_centroids[1:4,]
+point_dummy$col <- c("Cross-sectoral", "Health", "Surveillance", "Vet")
+new_fill_pal = c(col_pal_2, "Cross-sectoral"="black", "Health"="#ffbf40", "Surveillance"="#74e539", "Vet"="#4080ff")
+status_edit = status +
+  new_scale_fill() +
+  # geom_sf(data=g1, aes(fill=FINAL.CANINE.RABIES.STATUS), color=NA, alpha=0) +
+  geom_sf(data=point_dummy, aes(fill=col), stroke=0.7, alpha=0, size=2) +
+  scale_fill_manual(name="        Sector", values = new_fill_pal, drop=FALSE,
+                    guide=guide_legend(order=2, override.aes=list(alpha=1, shape=21, size=4))) +
+  ggtitle("Rabies Endemic Status")
+status_edit
+ggarrange(status_edit, budget_divert_map, mdv_map, arv_supply_map, staff_redeployed_map,
+          health_seeking_map, ncol=2, nrow=3, common.legend = TRUE)
+ggsave("figs/paper/combined_map_2.pdf", width=14, height=9)

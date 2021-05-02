@@ -23,6 +23,6 @@ point_map = function(map_bg = base_map, dataframe, map_title){
   # Add points to map
   basic_map + geom_sf(data=dataframe,
                       aes(fill=col, color=shap, shape=shap),
-                      stroke=0.7, size=2) +
+                      stroke=0.7, size=3) +
           ggtitle(map_title)
   }
