@@ -119,7 +119,7 @@ status = ggplot() +
   theme_void() +
   theme(legend.position = "top")
 status
-ggsave("figs/paper/map_endemic_status.pdf", height=8, width=14)
+# ggsave("figs/paper/map_endemic_status.pdf", height=8, width=14)
 
 #----- Produce initial stats ---------------------------------------------------
 
@@ -268,6 +268,20 @@ map_centroids = map_sf %>%
   group_by(CNTRY_TERR) %>%
   summarise() %>%
   st_centroid()
+
+# Set countries that had an in-depth interview conducted
+interview_countries = c("Haiti", "India", "Bangladesh", "Bhutan", "Nepal", "Pakistan",
+                        "Philippines", "Indonesia", "Sri Lanka", "Afghanistan", "Yemen",
+                        "Mali", "C??te d'Ivoire", "Gabon", "United Republic of Tanzania",
+                        "Kenya", "Uganda", "South Sudan", "Malawi")
+int_count_centroids = map_centroids %>%
+  filter(map_centroids$CNTRY_TERR %in% interview_countries)
+
+# Save endemic status map
+status = status +
+  geom_sf(data=int_count_centroids, size=2, shape=24, fill=NA, stroke=1)
+status
+ggsave("figs/paper/map_endemic_status.pdf", height=8, width=14)
 
 # Create base map
 base_map = ggplot() +
