@@ -279,7 +279,7 @@ int_count_centroids = map_centroids %>%
 
 # Save endemic status map
 status = status +
-  geom_sf(data=int_count_centroids, size=2, shape=24, fill=NA, stroke=1)
+  geom_sf(data=int_count_centroids, size=2, shape=24, stroke=0.9, fill=NA)
 status
 ggsave("figs/paper/map_endemic_status.pdf", height=8, width=14)
 
