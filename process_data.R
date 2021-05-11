@@ -113,8 +113,8 @@ status = ggplot() +
   geom_sf(data=map.world, fill="grey75", lwd=0.04, color=NA) + # colour="black",
   geom_sf(data=map.world.df, fill="white") +
   geom_sf(data=map.world.df, aes(color=FINAL.CANINE.RABIES.STATUS, fill=FINAL.CANINE.RABIES.STATUS), alpha=0.7) +
-  scale_fill_manual(name="Canine Rabies Status", values = col_pal_2, guide=guide_legend(order=1)) +
-  scale_color_manual(name="Canine Rabies Status", values = col_pal_2, guide=guide_legend(order=1)) +
+  scale_fill_manual(name="Canine Rabies Status of \ncountries with survey responses", values = col_pal_2, guide=guide_legend(order=1)) +
+  scale_color_manual(name="Canine Rabies Status of \ncountries with survey responses", values = col_pal_2, guide=guide_legend(order=1)) +
   coord_sf() +
   theme_void() +
   theme(legend.position = "top")
@@ -133,11 +133,19 @@ sector_labels = c("Vet", "Health", "Surveillance")
 
 # Barplot for reason mdv interupted
 cause_mdv_interuption_bp = cause_mdv_interuption %>%
-  mutate(plot_groups = ifelse(question %in% c("no.staff.available", "restrictions.on.staff.movement"), "Movement \nrestrictions",
+  mutate(plot_groups = ifelse(question %in% c("no.staff.available"), "Staff/resource diversion \nto COVID activities",
+                              ifelse(question %in% c("restrictions.on.staff.movement"), "Movement \nrestrictions",
                               ifelse(question %in% c("no.vaccines.available", "no.consumables.available"), "Supply \nissues",
                                      ifelse(question %in% c("difficult.to.adhere.to.covid.guidelines", "people.afraid.of.leaving.home.gathering"), "COVID safety \nmeasures",
                                             ifelse(question == "increased.cost.of.organizing", "Budget \nconstraints",
-                                                   ifelse(question == "other2", "Other", NA)))))) %>%
+                                                   ifelse(question == "other2", "Other", NA)))))))
+# Hard-code some responses for "Other"
+cause_mdv_interuption_bp$plot_groups[which(cause_mdv_interuption_bp$question == "other2" & cause_mdv_interuption_bp$p.n.%in% c(5,43,54,76))] <- "Budget \nconstraints"
+cause_mdv_interuption_bp$plot_groups[which(cause_mdv_interuption_bp$question == "other2" & cause_mdv_interuption_bp$p.n.%in% c(40,66))] <- "Staff/resource diversion \nto COVID activities"
+
+# Continue processing
+NA_cause_mdv_interuption_bp = paste0(unique(cause_mdv_interuption_bp$n_NAs), "/87")
+cause_mdv_interuption_bp <- cause_mdv_interuption_bp %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
   summarise(n=length(unique(p.n.))) %>% # tally()
   group_by(n_surveys, n_NAs, plot_groups) %>%
@@ -147,10 +155,7 @@ cause_mdv_interuption_bp = cause_mdv_interuption %>%
   filter(!is.na(plot_groups)) %>%
   arrange(desc(p))
 cause_mdv_interuption_bp$plot_groups <- factor(cause_mdv_interuption_bp$plot_groups, levels=cause_mdv_interuption_bp$plot_groups)
-# cause_mdv_interuption_bp$plot_groups <- factor(cause_mdv_interuption_bp$plot_groups,
-#                                                levels=c("Staff restrictions", "Supply issues",
-#                                                         "Covid-based restrictions", "Budget issues",
-#                                                         "Other"))
+
 cause_mdv_interuption_bp$type <- factor(cause_mdv_interuption_bp$type,
                                         levels=c("vet", "health", "surveillance"))
 bp_1 = ggplot(data=cause_mdv_interuption_bp, aes(x=plot_groups, y=p, fill=type)) +
@@ -164,11 +169,20 @@ bp_1
 
 # Barplot for disrutption to investigations
 cause_for_investigating_dis_bp = cause_for_investigating_dis %>%
-  mutate(plot_groups = ifelse(question %in% c("no.staff.available.1", "restrictions.on.staff.movement.1"), "Movement \nrestrictions",
+  mutate(plot_groups = ifelse(question %in% c("no.staff.available.1"), "Staff/resource diversion \nto COVID activities",
+                              ifelse(question %in% c("restrictions.on.staff.movement.1"), "Movement \nrestrictions",
                               ifelse(question %in% c("no.sample.collection.testing.kit.available"), "Supply \nissues",
                                      ifelse(question %in% c("difficult.to.adhere.to.covid.guidelines.1", "investigators.not.welcomed.in.communities"), "COVID safety \nmeasures",
                                             ifelse(question == "no.budget", "Budget \nconstraints",
-                                                   ifelse(question == "other7", "Other", NA)))))) %>%
+                                                  ifelse(question == "other7", "Other", NA)))))))
+
+# Hard-code some responses for "Other"
+cause_for_investigating_dis_bp$plot_groups[which(cause_for_investigating_dis_bp$question == "other7" & cause_for_investigating_dis_bp$p.n. == 41)] <- "Budget \nconstraints"
+cause_for_investigating_dis_bp$plot_groups[which(cause_for_investigating_dis_bp$question == "other7" & cause_for_investigating_dis_bp$p.n. %in% c(5,43,71))] <- "Staff/resource diversion \nto COVID activities"
+
+# Continue processing
+NA_cause_for_investigating_dis = paste0(unique(cause_for_investigating_dis$n_NAs), "/87")
+cause_for_investigating_dis_bp <- cause_for_investigating_dis_bp %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
   summarise(n=length(unique(p.n.))) %>% # tally()
   group_by(n_surveys, n_NAs, plot_groups) %>%
@@ -178,10 +192,7 @@ cause_for_investigating_dis_bp = cause_for_investigating_dis %>%
   filter(!is.na(plot_groups)) %>%
   arrange(desc(p))
 cause_for_investigating_dis_bp$plot_groups <- factor(cause_for_investigating_dis_bp$plot_groups, levels=cause_for_investigating_dis_bp$plot_groups)
-# cause_for_investigating_dis_bp$plot_groups <- factor(cause_for_investigating_dis_bp$plot_groups,
-#                                                      levels=c("Staff restrictions", "Supply issues",
-#                                                               "Covid-based restrictions", "Budget issues",
-#                                                               "Other"))
+
 bp_2 = ggplot(data=cause_for_investigating_dis_bp, aes(x=plot_groups, y=p, fill=type)) +
   geom_col() +
   labs(x="", y="Percentage of respondents") +
@@ -194,11 +205,18 @@ bp_2
 # Barplot for changes in health seeking behaviour
 change_in_health_seeking_bp = change_in_health_seeking %>%
   filter(question != "people.still.attending.clinics") %>%
-  mutate(plot_groups = ifelse(question %in% c("people.have.called.toll.free.numbers", "people.have.relied.more.on.local.remedies", "wound.washing.has.increased"), "Alternative \nmedicine",
-                              ifelse(question %in% c("people.have.avoided.clinics.due.to.fear.of.covid", "people.have.delayed.going.to.clinics", "people.have.interrupted.pep"), "Avoided \nclinics",
+  mutate(plot_groups = ifelse(question %in% c("people.have.relied.more.on.local.remedies", "wound.washing.has.increased"), "Alternative \nmedicine",
+                              ifelse(question %in% c("people.have.called.toll.free.numbers", "people.have.avoided.clinics.due.to.fear.of.covid", "people.have.delayed.going.to.clinics", "people.have.interrupted.pep"), "Avoided \nclinics",
                                      ifelse(question %in% c("people.cannot.reach.clinics.because.of.reduced.public.transport"), "Transport \nissues",
                                             ifelse(question %in% c("people.cannot.afford.travel"), "Costs",
-                                                   ifelse(question == "other8", "Other", NA)))))) %>%
+                                                   ifelse(question == "other8", "Other", NA))))))
+
+# Hard-code some responses for "Other"
+change_in_health_seeking_bp <- change_in_health_seeking_bp[-which(change_in_health_seeking_bp$question == "other8"),]
+
+# Continue processing
+NA_change_in_health_seeking = paste0(unique(change_in_health_seeking$n_NAs), "/87")
+change_in_health_seeking_bp <- change_in_health_seeking_bp %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
   summarise(n=length(unique(p.n.))) %>% # tally()
   group_by(n_surveys, n_NAs, plot_groups) %>%
@@ -208,9 +226,7 @@ change_in_health_seeking_bp = change_in_health_seeking %>%
   filter(!is.na(plot_groups)) %>%
   arrange(desc(p))
 change_in_health_seeking_bp$plot_groups <- factor(change_in_health_seeking_bp$plot_groups, levels=change_in_health_seeking_bp$plot_groups)
-# change_in_health_seeking_bp$plot_groups <- factor(change_in_health_seeking_bp$plot_groups,
-#                                                      levels=c("Avoidance of clinics", "Reliance on \nalternative healthcare",
-#                                                               "Transport issues", "Budget issues", "Other"))
+
 bp_3 = ggplot(data=change_in_health_seeking_bp, aes(x=plot_groups, y=p, fill=type)) +
   geom_col() +
   labs(x="", y="Percentage of respondents") +
@@ -223,11 +239,19 @@ bp_3
 # Barplot for disruption to PEP
 change_in_pep_bp = change_in_pep %>%
   filter(question != "people.still.attending.clinics") %>%
-  mutate(plot_groups = ifelse(question %in% c("staff.redeployed", "staff.reduced.due.to.quarantine"), "Movement \nrestrictions",
+  mutate(plot_groups = ifelse(question %in% c("some.many.arc.closed.converted", "staff.redeployed"), "Staff/resource diversion \nto COVID activities",
+                              ifelse(question %in% c("staff.reduced.due.to.quarantine"), "Movement \nrestrictions",
                               ifelse(question %in% c("staff.less.likely.to.recommend.pep", "follow.up.shots.delayed.cancelled"), "Change in PEP \nadministration",
                                      ifelse(question %in% c("vaccines.out.of.stock.due.to.supply.issues", "vaccines.available.only.in.the.private.sector", "consumables.not.available", "rig.not.available"), "Supply \nissues",
                                             ifelse(question %in% c("vaccines.out.of.stock.because.of.financial.constraints"), "Budget \nconstraints",
-                                                   ifelse(question == "other9", "Other", NA)))))) %>%
+                                                   ifelse(question == "other9", "Other", NA)))))))
+
+# Hard-code some responses for "Other"
+change_in_pep_bp$plot_groups[which(change_in_pep_bp$question == "other9" & change_in_pep_bp$p.n. %in% c(67,84))] <- "Change in PEP \nadministration"
+
+# Continue processing
+NA_change_in_pep = paste0(unique(change_in_pep$n_NAs), "/87")
+change_in_pep_bp <- change_in_pep_bp %>%
   group_by(p.n., n_surveys, n_NAs, plot_groups) %>%
   summarise(n=length(unique(p.n.))) %>% # tally()
   group_by(n_surveys, n_NAs, plot_groups) %>%
@@ -237,9 +261,7 @@ change_in_pep_bp = change_in_pep %>%
   filter(!is.na(plot_groups)) %>%
   arrange(desc(p))
 change_in_pep_bp$plot_groups <- factor(change_in_pep_bp$plot_groups, levels=change_in_pep_bp$plot_groups)
-# change_in_pep_bp$plot_groups <- factor(change_in_pep_bp$plot_groups,
-#                                        levels=c("Staff restrictions", "Change in PEP delivery",
-#                                                 "Supply issues", "Budget issues", "Other"))
+
 bp_4 = ggplot(data=change_in_pep_bp, aes(x=plot_groups, y=p, fill=type)) +
   geom_col() +
   labs(x="", y="Percentage of respondents") +
@@ -253,10 +275,12 @@ bp_4
 multi_plot = ggarrange(bp_1, bp_2, bp_3, bp_4, ncol=2, nrow=2, common.legend = TRUE, align="hv",
           labels=c("A", "B", "C", "D"))
 annotate_figure(multi_plot,
-                bottom = text_grob(label="A: Reasons for MDV disruption | B: Reasons for surveillance disruption
-                                   C: Observed changes in health seeking behaviour | D: Reasons for PEP disruption",
+                bottom = text_grob(label=paste0("A: Reasons for MDV disruption (", NA_cause_mdv_interuption_bp,
+                " unaffected) | B: Reasons for surveillance disruption (", NA_cause_for_investigating_dis,
+                " unaffected) \nC: Observed changes in health seeking behaviour (", NA_change_in_health_seeking,
+                " unaffected) | D: Reasons for PEP disruption  (", NA_change_in_pep, " unaffected)"),
                                    hjust = 1, x = 1, face = "italic", size = 10))
-ggsave("figs/paper/multi_panel_barplot.pdf", height=10, width=8)
+ggsave("figs/paper/multi_panel_barplot_alt.pdf", height=10, width=8)
 
 #----- Produce maps with yes/no responses --------------------------------------
 
@@ -304,8 +328,8 @@ base_map + geom_sf(data=map_centroids)
 source("R/process_yes_no.R")
 
 # Produce maps, and save as individual files
-budget_divert_map = point_map(dataframe=budget_divert_centroids,
-                              map_title="Rabies budget reduced/diverted")
+# budget_divert_map = point_map(dataframe=budget_divert_centroids,
+#                               map_title="Rabies budget reduced/diverted")
 # ggsave("figs/paper/individual_point_maps/map_budget_divert.pdf", width=10, height=6)
 mdv_map = point_map(dataframe=mdv_centroids,
                     map_title="Dog vaccination campaigns disrupted")
@@ -313,8 +337,8 @@ mdv_map = point_map(dataframe=mdv_centroids,
 # arv_demand_map = point_map(dataframe=increased_arv_demand_centroids,
 #                     map_title="Vets experienced higher demand for ARV")
 # ggsave("figs/paper/individual_point_maps/map_vet_arv_demand.pdf", width=10, height=6)
-arv_supply_map = point_map(dataframe=arv_supply_centroids,
-                           map_title="Dog vaccine production/supply affected")
+# arv_supply_map = point_map(dataframe=arv_supply_centroids,
+#                            map_title="Dog vaccine production/supply affected")
 # ggsave("figs/paper/individual_point_maps/map_vet_arv_supply.pdf", width=10, height=6)
 staff_redeployed_map = point_map(dataframe=staff_redeployed_centroids,
                            map_title="Surveillance staff redeployed")
@@ -348,9 +372,9 @@ health_seeking_map = point_map(dataframe=health_seeking_centroids,
 # ggsave("figs/paper/combined_map_V2.pdf", width=15, height=9)
 
 # Produce reduced combined map
-ggarrange(budget_divert_map, mdv_map, arv_supply_map, staff_redeployed_map, health_seeking_map,
-          ncol=2, nrow=3, common.legend = TRUE)
-ggsave("figs/paper/combined_map_1.pdf", width=14, height=9)
+# ggarrange(budget_divert_map, mdv_map, arv_supply_map, staff_redeployed_map, health_seeking_map,
+#           ncol=2, nrow=3, common.legend = TRUE)
+# ggsave("figs/paper/combined_map_1.pdf", width=14, height=9)
 
 # Combine map with endemic status
 point_dummy <- health_seeking_centroids[1:4,]
@@ -364,6 +388,6 @@ status_edit = status +
                     guide=guide_legend(order=2, override.aes=list(alpha=1, shape=21, size=4))) +
   ggtitle("Rabies Endemic Status")
 status_edit
-ggarrange(status_edit, budget_divert_map, mdv_map, arv_supply_map, staff_redeployed_map,
-          health_seeking_map, ncol=2, nrow=3, common.legend = TRUE)
-ggsave("figs/paper/combined_map_2.pdf", width=14, height=9)
+ggarrange(status_edit, mdv_map, staff_redeployed_map, health_seeking_map,
+          ncol=2, nrow=2, common.legend = TRUE)
+ggsave("figs/paper/combined_map_2.pdf", width=14, height=7)
