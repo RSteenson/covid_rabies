@@ -45,7 +45,7 @@ map.world = read_sf("data/WHO Map boundaries/MapTemplate_detailed_2013/Shapefile
 
 # Create colour and alpha palette
 # col_pal_1 = c("Endemic"="red2", "Controlled"="#ff6666", "Not endemic"="grey35", "Global"="dimgrey")
-col_pal_2 = c("Endemic"="firebrick2", "Controlled"="#E69F00", "Not endemic"="dimgrey", "Global"="dimgrey")
+col_pal_2 = c("Endemic"="firebrick2", "Controlled"="#E69F00", "Dog-mediated rabies free"="dimgrey", "Global"="dimgrey")
 alph_pal = c("positive"=1, "negative"=0.1)
 
 #----- Initial data processing -------------------------------------------------
@@ -73,7 +73,7 @@ country_df <- survey_data %>%
   merge(., country_data, by.x="country", by.y="COUNTRY", all.x=TRUE) %>%
   dplyr::select(country, FINAL.CANINE.RABIES.STATUS) %>%
   mutate(FINAL.CANINE.RABIES.STATUS = ifelse(FINAL.CANINE.RABIES.STATUS=="endemic", "Endemic",
-                                             ifelse(FINAL.CANINE.RABIES.STATUS=="controlled", "Controlled", "Not endemic"))) %>%
+                                             ifelse(FINAL.CANINE.RABIES.STATUS=="controlled", "Controlled", "Dog-mediated rabies free"))) %>%
   unique()
 
 # Merge country_df into survey data to capture endemic status
@@ -87,7 +87,7 @@ survey_data$FINAL.CANINE.RABIES.STATUS[which(survey_data$country=="Global")] <- 
 country_df <- country_df[-which(country_df$country %in% c("Global_1", "Global_2", "Global_3", "Global_4")),]
 
 # Set factor level
-country_df$FINAL.CANINE.RABIES.STATUS = factor(country_df$FINAL.CANINE.RABIES.STATUS, levels=c("Endemic", "Controlled", "Not endemic"))
+country_df$FINAL.CANINE.RABIES.STATUS = factor(country_df$FINAL.CANINE.RABIES.STATUS, levels=c("Endemic", "Controlled", "Dog-mediated rabies free"))
 
 # CHECK!
 sort(unique(country_df$country[-which(country_df$country %in% map.world$CNTRY_TERR)]))
@@ -112,12 +112,13 @@ map.world.df <- map.world %>%
 status = ggplot() +
   geom_sf(data=map.world, fill="grey75", lwd=0.04, color=NA) + # colour="black",
   geom_sf(data=map.world.df, fill="white") +
-  geom_sf(data=map.world.df, aes(color=FINAL.CANINE.RABIES.STATUS, fill=FINAL.CANINE.RABIES.STATUS), alpha=0.7) +
-  scale_fill_manual(name="Canine Rabies Status of \ncountries with survey responses", values = col_pal_2, guide=guide_legend(order=1)) +
-  scale_color_manual(name="Canine Rabies Status of \ncountries with survey responses", values = col_pal_2, guide=guide_legend(order=1)) +
+  geom_sf(data=map.world.df, aes(color=FINAL.CANINE.RABIES.STATUS, fill=FINAL.CANINE.RABIES.STATUS), alpha=0.8) +
+  scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal_2, guide=guide_legend(order=1)) +
+  scale_color_manual(name="Status of countries \nwith survey responses", values = col_pal_2, guide=guide_legend(order=1)) +
   coord_sf() +
   theme_void() +
-  theme(legend.position = "top")
+  theme(legend.position = "top", legend.title = element_text(size=13),
+        legend.text = element_text(size=13))
 status
 # ggsave("figs/paper/map_endemic_status.pdf", height=8, width=14)
 
@@ -164,7 +165,9 @@ bp_1 = ggplot(data=cause_mdv_interuption_bp, aes(x=plot_groups, y=p, fill=type))
   scale_y_continuous(limits=c(0, 100)) +
   scale_fill_manual(name="Sector: ", values=sector_cols, labels=sector_labels, drop=FALSE) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle=45, hjust=1, size=12)) #, legend.title = element_blank()) # legend.position = "none",
+  theme(axis.text.x = element_text(angle=45, hjust=1, size=12),
+        legend.title = element_text(size=14),
+        legend.text = element_text(size=14)) #, legend.title = element_blank()) # legend.position = "none",
 bp_1
 
 # Barplot for disrutption to investigations
@@ -276,9 +279,9 @@ multi_plot = ggarrange(bp_1, bp_2, bp_3, bp_4, ncol=2, nrow=2, common.legend = T
           labels=c("A", "B", "C", "D"))
 annotate_figure(multi_plot,
                 bottom = text_grob(label=paste0("A: Reasons for MDV disruption (", NA_cause_mdv_interuption_bp,
-                " unaffected) | B: Reasons for surveillance disruption (", NA_cause_for_investigating_dis,
+                " unaffected), B: Reasons for surveillance disruption (", NA_cause_for_investigating_dis,
                 " unaffected) \nC: Observed changes in health seeking behaviour (", NA_change_in_health_seeking,
-                " unaffected) | D: Reasons for PEP disruption  (", NA_change_in_pep, " unaffected)"),
+                " unaffected), D: Reasons for PEP disruption  (", NA_change_in_pep, " unaffected)"),
                                    hjust = 1, x = 1, face = "italic", size = 10))
 ggsave("figs/paper/multi_panel_barplot_alt.pdf", height=10, width=8)
 
@@ -305,14 +308,14 @@ int_count_centroids = map_centroids %>%
 status = status +
   geom_sf(data=int_count_centroids, size=2, shape=24, stroke=0.9, fill=NA)
 status
-ggsave("figs/paper/map_endemic_status.pdf", height=8, width=14)
+# ggsave("figs/paper/map_endemic_status.pdf", height=8, width=14)
 
 # Create base map
 base_map = ggplot() +
   geom_sf(data=map.world, #, aes(x=long, y=lat, group=group),
                fill="grey75", color=NA, lwd=0.04) +
   geom_sf(data=map.world.df, #, aes(x=long, y=lat, group=group),
-               fill="grey50", color="grey35", lwd=0.04) +
+               fill="#ecddd0", color="#e9d7c8", lwd=0.04) +
   coord_sf() +
   theme_void()
 
@@ -377,16 +380,16 @@ health_seeking_map = point_map(dataframe=health_seeking_centroids,
 # ggsave("figs/paper/combined_map_1.pdf", width=14, height=9)
 
 # Combine map with endemic status
-point_dummy <- health_seeking_centroids[1:4,]
-point_dummy$col <- c("Cross-sectoral", "Health", "Surveillance", "Vet")
-new_fill_pal = c(col_pal_2, "Cross-sectoral"="black", "Health"="#ffbf40", "Surveillance"="#74e539", "Vet"="#4080ff")
+point_dummy <- health_seeking_centroids[1:3,]
+point_dummy$col <- c("Health", "Surveillance", "Vet")
+new_fill_pal = c(col_pal_2, "Health"="#ffbf40", "Surveillance"="#74e539", "Vet"="#4080ff")
 status_edit = status +
   new_scale_fill() +
   # geom_sf(data=g1, aes(fill=FINAL.CANINE.RABIES.STATUS), color=NA, alpha=0) +
   geom_sf(data=point_dummy, aes(fill=col), stroke=0.7, alpha=0, size=2) +
   scale_fill_manual(name="        Sector", values = new_fill_pal, drop=FALSE,
                     guide=guide_legend(order=2, override.aes=list(alpha=1, shape=21, size=4))) +
-  ggtitle("Rabies Endemic Status")
+  ggtitle("Dog-mediated rabies")
 status_edit
 ggarrange(status_edit, mdv_map, staff_redeployed_map, health_seeking_map,
           ncol=2, nrow=2, common.legend = TRUE)
