@@ -166,8 +166,8 @@ bp_1 = ggplot(data=cause_mdv_interuption_bp, aes(x=plot_groups, y=p, fill=type))
   scale_fill_manual(name="Sector: ", values=sector_cols, labels=sector_labels, drop=FALSE) +
   theme_classic() +
   theme(axis.text.x = element_text(angle=45, hjust=1, size=12),
-        legend.title = element_text(size=14),
-        legend.text = element_text(size=14)) #, legend.title = element_blank()) # legend.position = "none",
+        legend.title = element_text(size=13),
+        legend.text = element_text(size=13)) #, legend.title = element_blank()) # legend.position = "none",
 bp_1
 
 # Barplot for disrutption to investigations
