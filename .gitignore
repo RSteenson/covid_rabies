@@ -1,3 +1,10 @@
-# Prevent data from being shared
-data/
-output/Frontiers/
+# Prevent data from being shared from TRSTMH folder
+TRSTMH/data/
+TRSTMH/output/
+TRSTMH/figs/*.pdf
+TRSTMH/figs/paper/archive
+
+# Prevent data from being shared from Frontiers folder
+Frontiers/data/
+Frontiers/output/
+Frontiers/figs/archive
