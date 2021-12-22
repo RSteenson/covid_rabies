@@ -6,5 +6,5 @@ TRSTMH/figs/paper/archive
 
 # Prevent data from being shared from Frontiers folder
 Frontiers/data/
-Frontiers/output/
+Frontiers/output/archive
 Frontiers/figs/archive
