@@ -1,7 +1,10 @@
 "endemic_status","result","n"
-"Endemic","Disruption",26
-"Endemic","Not available",6
-"In-progress","Disruption",6
+"Endemic","Disruption",24
+"Endemic","No disruption",1
+"Endemic","Not available",7
+"In-progress","Disruption",5
+"In-progress","No disruption",1
 "In-progress","Not available",3
-"Rabies-free","No disruption",2
-"Rabies-free","Not available",4
+"Rabies-free","Disruption",1
+"Rabies-free","No disruption",3
+"Rabies-free","Not available",3

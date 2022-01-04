@@ -1,23 +1,23 @@
 "work_sector","endemic_status","n"
-"Academia/research","Endemic",13
-"Academia/research","In-progress",2
-"Animal health frontline","Endemic",8
-"Animal health frontline","In-progress",3
-"Animal health frontline","Rabies-free",2
-"Animal welfare","Endemic",1
-"Civil society/NGO","In-progress",2
-"Human health frontline","Endemic",2
-"International organisation","Endemic",13
-"International organisation","In-progress",2
-"Laboratory","Endemic",1
-"Laboratory","Rabies-free",1
-"Local government","Rabies-free",2
 "National policy making/government","Endemic",19
 "National policy making/government","In-progress",1
 "National policy making/government","Rabies-free",3
-"Other","Endemic",1
+"Academia/research","Endemic",13
+"Academia/research","In-progress",2
+"International organisation","Endemic",13
+"International organisation","In-progress",2
+"Animal health frontline","Endemic",8
+"Animal health frontline","In-progress",3
+"Animal health frontline","Rabies-free",2
+"Civil society/NGO","In-progress",2
+"Human health frontline","Endemic",2
+"Laboratory","Endemic",1
+"Laboratory","Rabies-free",1
+"Local government","Rabies-free",2
 "Programme management","Endemic",1
 "Programme management","In-progress",1
 "Regional organisation","Endemic",1
 "Regional organisation","In-progress",1
 "Vaccine industry/logistics","Endemic",2
+"Animal welfare","Endemic",1
+"Other","Endemic",1
