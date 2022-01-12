@@ -5,7 +5,9 @@ TRSTMH/figs/*.pdf
 TRSTMH/figs/paper/archive
 
 # Prevent data from being shared from Frontiers folder
-Frontiers/data/
+Frontiers/data/*.xlsx
+Frontiers/data/Frontiers_data.csv
+Frontiers/data/WHO map boundaries
 Frontiers/output/archive
 Frontiers/figs/archive
 Frontiers/figs/*.afdesign
