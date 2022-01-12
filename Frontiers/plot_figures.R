@@ -55,7 +55,7 @@ fig_1a_plot = ggplot() +
   geom_sf(data=world_shp_data, aes(fill=endemic_status), color="white", lwd=0.04, alpha=0.8) +
   scale_fill_manual(name="Status of countries \nwith survey responses   ", values = col_pal, labels=c("Endemic   ", "In-progress   ", "Rabies-free")) +
   # scale_color_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  geom_sf(data=country_centroids, fill="black", shape=1, size=2, stroke=1) +
+  geom_sf(data=country_centroids, fill="black", shape=1, size=2.5, stroke=0.8) +
   coord_sf() +
   theme_void() +
   theme(legend.position = "top", legend.title = element_text(size=12),
