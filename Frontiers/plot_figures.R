@@ -126,18 +126,18 @@ ggsave("figs/Figure_2.pdf", height=10, width=10)
 
 #----- Process data for barplot
 
-fig_3a$question <- factor(fig_3a$question, levels=unique(fig_3a$question))
-fig_3b$question <- factor(fig_3b$question, levels=unique(fig_3b$question))
-fig_3c$question <- factor(fig_3c$question, levels=unique(fig_3c$question))
-fig_3d$question <- factor(fig_3d$question, levels=unique(fig_3d$question))
+fig_3a$grouped_response <- factor(fig_3a$grouped_response, levels=unique(fig_3a$grouped_response))
+fig_3b$grouped_response <- factor(fig_3b$grouped_response, levels=unique(fig_3b$grouped_response))
+fig_3c$grouped_response <- factor(fig_3c$grouped_response, levels=unique(fig_3c$grouped_response))
+fig_3d$grouped_response <- factor(fig_3d$grouped_response, levels=unique(fig_3d$grouped_response))
 
 #----- Produce panel 3a
 
-fig_3a_plot = ggplot(data=fig_3a, aes(x=question, y=n, fill=endemic_status)) +
+fig_3a_plot = ggplot(data=fig_3a, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8, width=0.9)+
   scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Reasons for disruption to mass dog vaccination", y="Number of respondents\n") +
-  scale_y_continuous(limits=c(0,50)) +
+  labs(title="Reasons for disruption to mass dog vaccination", y="Number of countries\n") +
+  scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
@@ -147,11 +147,11 @@ fig_3a_plot
 
 #----- Produce panel 3b
 
-fig_3b_plot = ggplot(data=fig_3b, aes(x=question, y=n, fill=endemic_status)) +
+fig_3b_plot = ggplot(data=fig_3b, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8)+
   scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Reasons for disruption to access to post-exposure prophylaxis", y="Number of respondents\n") +
-  scale_y_continuous(limits=c(0,50)) +
+  labs(title="Reasons for disruption to access to post-exposure prophylaxis", y="Number of countries\n") +
+  scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
@@ -161,11 +161,11 @@ fig_3b_plot
 
 #----- Produce panel 3c
 
-fig_3c_plot = ggplot(data=fig_3c, aes(x=question, y=n, fill=endemic_status)) +
+fig_3c_plot = ggplot(data=fig_3c, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8)+
   scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Reasons for disruption to delivery of post-exposure prophyaxis", y="Number of respondents\n") +
-  scale_y_continuous(limits=c(0,50)) +
+  labs(title="Reasons for disruption to delivery of post-exposure prophyaxis", y="Number of countries\n") +
+  scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
@@ -175,11 +175,11 @@ fig_3c_plot
 
 #----- Produce panel 3d
 
-fig_3d_plot = ggplot(data=fig_3d, aes(x=question, y=n, fill=endemic_status)) +
+fig_3d_plot = ggplot(data=fig_3d, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8)+
   scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Reasons for disruption to surveillance", y="Number of respondents\n") +
-  scale_y_continuous(limits=c(0,50)) +
+  labs(title="Reasons for disruption to surveillance", y="Number of countries\n") +
+  scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
@@ -208,7 +208,7 @@ fig_4c$question <- factor(fig_4c$question, levels=unique(fig_4c$question))
 fig_4a_plot = ggplot(data=fig_4a, aes(x=question, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8, width=0.9)+
   scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Changes in free-roaming dog populations and behaviour", y="Number of respondents\n") +
+  labs(title="Changes in free-roaming dog populations and behaviour", y="Number of countries\n") +
   scale_y_continuous(limits=c(0,35)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
@@ -222,7 +222,7 @@ fig_4a_plot
 fig_4b_plot = ggplot(data=fig_4b, aes(x=question, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8, width=0.9)+
   scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Changes in human-dog interactions", y="Number of respondents\n") +
+  labs(title="Changes in human-dog interactions", y="Number of countries\n") +
   scale_y_continuous(limits=c(0,35)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
@@ -236,7 +236,7 @@ fig_4b_plot
 fig_4c_plot = ggplot(data=fig_4c, aes(x=question, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8, width=0.9)+
   scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Changes in media reporting of dogs", y="Number of respondents\n") +
+  labs(title="Changes in media reporting of dogs", y="Number of countries\n") +
   scale_y_continuous(limits=c(0,35)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
