@@ -10,7 +10,7 @@ library(tidyr)
 source("R/recode_countries.R")
 
 # Load spreadsheet
-survey_data <- read.csv("data/Frontiers_data_V2.csv", stringsAsFactors = FALSE)
+survey_data <- read.csv("data/Frontiers_data_V3.csv", stringsAsFactors = FALSE)
 
 # Trim whitespace on country names
 survey_data$country <- trimws(survey_data$country, which="right")
@@ -75,11 +75,9 @@ write.csv(fig_1b, "output/figure_1b.csv", row.names = FALSE)
 
 # Subset and process data
 fig_2a <- survey_data %>%
-  dplyr::select(country, "endemic_status"=progress.in.rabies.control..1free.2in.progress.3endemic, disruption.to.mdv) %>%
-                # yes.as.planned, yes.but.delayed.took.longer, yes.but.below.target,
-                # yes.but.interrupted.early, no.not.even.started, NA1
-  # gather(., question, response, yes.as.planned:NA1) %>%
-  # filter(response == 1) %>%
+  dplyr::select(country, "endemic_status"=progress.in.rabies.control..1free.2in.progress.3endemic,
+                "disruption.to.mdv"=country.disruption.to.mdv) %>%
+  distinct() %>%
   mutate("result" = ifelse(is.na(disruption.to.mdv), "Not available",
                            ifelse(disruption.to.mdv == "No", "No disruption",
                                   ifelse(disruption.to.mdv == "Yes", "Disruption", NA)))) %>%
@@ -117,11 +115,8 @@ write.csv(fig_2a, "output/figure_2a.csv", row.names = FALSE)
 # Subset and process data
 fig_2b <- survey_data %>%
   dplyr::select(country, "endemic_status"=progress.in.rabies.control..1free.2in.progress.3endemic,
-                "disruption.to.pep"=overall.disruption.to.PEP..people.s.health.seeking.behaviour...PEP.delivery.) %>%
-  # gather(., question, response, some.many.clinics.closed.converted:NA9) %>%
-  # filter(response == 1) %>%
-  # mutate("result" = ifelse(question == "no.changes4", "No disruption",
-  #                          ifelse(question == "NA9", "Not available", "Disruption"))) %>%
+                "disruption.to.pep"=country.overall.disruption.to.PEP..people.s.health.seeking.behaviour...PEP.delivery.) %>%
+  distinct() %>%
   mutate("result" = ifelse(is.na(disruption.to.pep), "Not available",
                            ifelse(disruption.to.pep == "No", "No disruption",
                                   ifelse(disruption.to.pep == "Yes", "Disruption", NA)))) %>%
@@ -145,7 +140,7 @@ for(i in countries){
 
 # CHECK
 nrow(fig_2b)
-table(fig_2b$result)
+table(fig_2b$endemic_status, fig_2b$result)
 
 # Make final summary calculation
 fig_2b <- fig_2b %>%
@@ -160,7 +155,8 @@ write.csv(fig_2b, "output/figure_2b.csv", row.names = FALSE)
 # Subset and process data
 fig_2c <- survey_data %>%
   dplyr::select(country, "endemic_status"=progress.in.rabies.control..1free.2in.progress.3endemic,
-                disruption.to.awareness.activities) %>%
+                "disruption.to.awareness.activities"=country.disruption.to.awareness.activities) %>%
+  distinct() %>%
   mutate("result" = ifelse(is.na(disruption.to.awareness.activities), "Not available",
                            ifelse(disruption.to.awareness.activities == "No", "No disruption",
                            ifelse(disruption.to.awareness.activities == "Yes", "Disruption", NA)))) %>%
@@ -169,7 +165,7 @@ fig_2c <- survey_data %>%
 
 # CHECK
 nrow(fig_2c)
-table(fig_2c$result, useNA="always")
+table(fig_2c$endemic_status, fig_2c$result)
 
 # Make final summary calculation
 fig_2c <- fig_2c %>%
@@ -190,29 +186,33 @@ fig_3a <- survey_data %>%
                 no.consumables.available, difficult.to.adhere.to.COVID.19.guidelines,
                 people.afraid.of.leaving.home.gathering, increased.cost.of.organizing,
                 other2) %>%
-  gather(., question, response, no.staff.available:other2) %>%
-  group_by(endemic_status, question) %>%
-  summarise(n=sum(response))
-
-# Recode question responses
-fig_3a$question[which(fig_3a$question=="restrictions.on.staff.movement")] <- "Restrictions on staff movement"
-fig_3a$question[which(fig_3a$question=="difficult.to.adhere.to.COVID.19.guidelines")] <- "Difficult to adhere to COVID-19 guidelines"
-fig_3a$question[which(fig_3a$question=="people.afraid.of.leaving.home.gathering")] <- "People afraid of leaving home/gathering"
-fig_3a$question[which(fig_3a$question=="no.vaccines.available")] <- "No/limited vaccines available"
-fig_3a$question[which(fig_3a$question=="no.staff.available")] <- "No staff available"
-fig_3a$question[which(fig_3a$question=="increased.cost.of.organizing")] <- "Increased cost of organizing"
-fig_3a$question[which(fig_3a$question=="no.consumables.available")] <- "No consumables available"
-fig_3a$question[which(fig_3a$question=="other2")] <- "Other"
+  gather(., question, response, no.staff.available:increased.cost.of.organizing) %>%
+  group_by(country, endemic_status, question) %>%
+  summarise(n=sum(response)) %>%
+  # Remove all zero response
+  filter(n > 0) %>%
+  # Make all country results equal
+  mutate(n = 1) %>%
+  # Recode result names
+  mutate(grouped_response = ifelse(question == "restrictions.on.staff.movement", "Restrictions on staff movement",
+                                   ifelse(question == "difficult.to.adhere.to.COVID.19.guidelines", "Difficult to adhere to COVID-19 guidelines",
+                                          ifelse(question == "people.afraid.of.leaving.home.gathering", "People afraid of leaving home/gathering",
+                                                 ifelse(question == "no.vaccines.available", "No/limited vaccines available",
+                                                        ifelse(question == "no.staff.available", "No staff available",
+                                                               ifelse(question == "increased.cost.of.organizing", "Increased cost of organizing",
+                                                                      ifelse(question == "no.consumables.available", "No consumables available", NA)))))))) %>%
+  group_by(endemic_status, grouped_response) %>%
+  summarise(n=sum(n))
 
 # Collect totals
 fig_3a_totals <- fig_3a %>%
-  group_by(question) %>%
+  group_by(grouped_response) %>%
   summarise(ord = sum(n)) %>%
   arrange(desc(ord))
 
 # Rearrange data based on totals
 fig_3a <- fig_3a %>%
-  arrange(factor(question, levels=fig_3a_totals$question))
+  arrange(factor(grouped_response, levels=fig_3a_totals$grouped_response))
 
 # Save output
 write.csv(fig_3a, "output/figure_3a.csv", row.names = FALSE)
@@ -225,30 +225,34 @@ fig_3b <- survey_data %>%
                 people.have.avoided.clinics.due.to.fear.of.COVID.19, people.cannot.afford.travel,
                 people.cannot.reach.clinics.because.of.reduced.public.transport,
                 people.have.delayed.going.to.clinics, people.have.relied.more.on.local.remedies,
-                people.have.used.toll.free.numbers.telemedicine, other8) %>%
-  gather(., question, response, people.have.avoided.clinics.due.to.fear.of.COVID.19:other8) %>%
-  group_by(endemic_status, question) %>%
-  summarise(n=sum(response))
-
-# Recode question responses
-fig_3b$question[which(fig_3b$question=="people.have.avoided.clinics.due.to.fear.of.COVID.19")] <- "People feared COVID-19 in clinics"
-fig_3b$question[which(fig_3b$question=="people.cannot.afford.travel")] <- "People cannot afford travel"
-fig_3b$question[which(fig_3b$question=="people.cannot.reach.clinics.because.of.reduced.public.transport")] <- "People cannot use public transportation"
-fig_3b$question[which(fig_3b$question=="people.have.delayed.going.to.clinics")] <- "People delayed going to clinics"
-fig_3b$question[which(fig_3b$question=="people.have.relied.more.on.local.remedies")] <- "People relied on local remedies/healers"
-fig_3b$question[which(fig_3b$question=="people.have.used.toll.free.numbers.telemedicine")] <- "People used toll-free numbers/telemedicine"
-fig_3b$question[which(fig_3b$question=="other8")] <- "Other"
+                people.have.used.toll.free.numbers.telemedicine, people.have.interrupted.PEP) %>%
+  gather(., question, response, people.have.avoided.clinics.due.to.fear.of.COVID.19:people.have.interrupted.PEP) %>%
+  group_by(country, endemic_status, question) %>%
+  summarise(n=sum(response)) %>%
+  # Remove all zero response
+  filter(n > 0) %>%
+  # Make all country results equal
+  mutate(n = 1) %>%
+  # Recode result names
+  mutate(grouped_response = ifelse(question == "people.have.avoided.clinics.due.to.fear.of.COVID.19", "People feared COVID-19 in clinics",
+                                 ifelse(question == "people.cannot.afford.travel", "People could not afford travel",
+                                        ifelse(question == "people.cannot.reach.clinics.because.of.reduced.public.transport", "People could not use public transportation",
+                                               ifelse(question == "people.have.delayed.going.to.clinics", "People delayed going to clinics",
+                                                      ifelse(question == "people.have.relied.more.on.local.remedies", "People relied on local remedies/healers",
+                                                             ifelse(question == "people.have.used.toll.free.numbers.telemedicine", "People used toll-free numbers/telemedicine",
+                                                                    ifelse(question == "people.have.interrupted.PEP", "People interrupted the vaccination schedule", NA)))))))) %>%
+  group_by(endemic_status, grouped_response) %>%
+  summarise(n=sum(n))
 
 # Collect totals
 fig_3b_totals <- fig_3b %>%
-  group_by(question) %>%
+  group_by(grouped_response) %>%
   summarise(ord = sum(n)) %>%
   arrange(desc(ord))
 
 # Rearrange data based on totals
 fig_3b <- fig_3b %>%
-  arrange(factor(question, levels=fig_3b_totals$question)) %>%
-  filter(question != "Other")
+  arrange(factor(grouped_response, levels=fig_3b_totals$grouped_response))
 
 # Save output
 write.csv(fig_3b, "output/figure_3b.csv", row.names = FALSE)
@@ -259,40 +263,41 @@ write.csv(fig_3b, "output/figure_3b.csv", row.names = FALSE)
 fig_3c <- survey_data %>%
   mutate(vaccines.out.of.stock = ifelse(vaccines.out.of.stock.because.of.financial.constraints == 1 |
                                           vaccines.out.of.stock.because.of.supply.issues == 1,
-                                        1, 0)) %>%
+                                        1, 0),
+         staff.less.diligent = ifelse(staff.less.diligent.due.to.stress == 1 |
+                                        staff.less.likely.to.recommend.PEP == 1,
+                                      1, 0)) %>%
   dplyr::select(country, "endemic_status"=progress.in.rabies.control..1free.2in.progress.3endemic,
                 some.many.clinics.closed.converted, staff.redeployed, staff.reduced.due.to.quarantine.illness,
-                staff.less.diligent.due.to.stress, staff.less.likely.to.recommend.PEP,
-                follow.up.shots.delayed.cancelled, vaccines.out.of.stock,
-                vaccines.available.only.in.the.private.sector,
-                consumables.not.available, RIG.not.available, other9) %>%
-  gather(., question, response, some.many.clinics.closed.converted:other9) %>%
-  group_by(endemic_status, question) %>%
-  summarise(n=sum(response))
-
-# Recode question responses
-fig_3c$question[which(fig_3c$question=="some.many.clinics.closed.converted")] <- "Clinics closed/converted"
-fig_3c$question[which(fig_3c$question=="staff.redeployed")] <- "Staff redeployed"
-fig_3c$question[which(fig_3c$question=="staff.reduced.due.to.quarantine.illness")] <- "Staff reduced due to quarantine/illness"
-fig_3c$question[which(fig_3c$question=="staff.less.diligent.due.to.stress")] <- "Staff less diligant due to stress"
-fig_3c$question[which(fig_3c$question=="staff.less.likely.to.recommend.PEP")] <- "Staff less likely to recommend PEP"
-fig_3c$question[which(fig_3c$question=="follow.up.shots.delayed.cancelled")] <- "Follow up vaccines delayed/cancelled"
-fig_3c$question[which(fig_3c$question=="vaccines.out.of.stock")] <- "Vaccines out of stock due to \nfinancial constraints/supply issues"
-fig_3c$question[which(fig_3c$question=="vaccines.available.only.in.the.private.sector")] <- "Vaccines avaialable only/mostly \nin the private sector"
-fig_3c$question[which(fig_3c$question=="consumables.not.available")] <- "Consumables not available"
-fig_3c$question[which(fig_3c$question=="RIG.not.available")] <- "RIG not available"
-fig_3c$question[which(fig_3c$question=="other9")] <- "Other"
+                staff.less.diligent, follow.up.shots.delayed.cancelled, vaccines.out.of.stock,
+                vaccines.available.only.in.the.private.sector) %>%
+  gather(., question, response, some.many.clinics.closed.converted:vaccines.available.only.in.the.private.sector) %>%
+  group_by(country, endemic_status, question) %>%
+  summarise(n=sum(response)) %>%
+  # Remove all zero response
+  filter(n > 0) %>%
+  # Make all country results equal
+  mutate(n = 1) %>%
+  # Recode result names
+  mutate(grouped_response = ifelse(question == "some.many.clinics.closed.converted", "Clinics closed/converted",
+                                   ifelse(question == "staff.redeployed", "Staff redeployed",
+                                          ifelse(question == "staff.reduced.due.to.quarantine.illness", "Staff reduced due to quarantine/illness",
+                                                 ifelse(question == "staff.less.diligent", "Staff less diligant due to stress/vaccine shortage",
+                                                        ifelse(question == "follow.up.shots.delayed.cancelled", "Follow up vaccines delayed/cancelled",
+                                                               ifelse(question == "vaccines.out.of.stock", "No vaccines availabile",
+                                                                      ifelse(question == "vaccines.available.only.in.the.private.sector", "Vaccines avaailable only/mostly \nin the private sector", NA)))))))) %>%
+  group_by(endemic_status, grouped_response) %>%
+  summarise(n=sum(n))
 
 # Collect totals
 fig_3c_totals <- fig_3c %>%
-  group_by(question) %>%
+  group_by(grouped_response) %>%
   summarise(ord = sum(n)) %>%
   arrange(desc(ord))
 
 # Rearrange data based on totals
 fig_3c <- fig_3c %>%
-  arrange(factor(question, levels=fig_3c_totals$question)) %>%
-  filter(question != "Other")
+  arrange(factor(grouped_response, levels=fig_3c_totals$grouped_response))
 
 # Save output
 write.csv(fig_3c, "output/figure_3c.csv", row.names = FALSE)
@@ -307,27 +312,32 @@ fig_3d <- survey_data %>%
                 no.budget, difficult.to.adhere.to.COVID.19.guidelines.1,
                 investigators.not.welcome.in.communities, other7) %>%
   gather(., question, response, no.staff.available.1:other7) %>%
-  group_by(endemic_status, question) %>%
-  summarise(n=sum(response))
-
-# Recode question responses
-fig_3d$question[which(fig_3d$question=="no.staff.available.1")] <- "No staff available"
-fig_3d$question[which(fig_3d$question=="restrictions.on.staff.movement.1")] <- "Restrictions on staff movements"
-fig_3d$question[which(fig_3d$question=="no.sample.collection.testing.kit.available")] <- "No sample collection/testing kits available"
-fig_3d$question[which(fig_3d$question=="no.budget")] <- "No budget"
-fig_3d$question[which(fig_3d$question=="difficult.to.adhere.to.COVID.19.guidelines.1")] <- "Difficult to adhere to COVID-19 guidelines"
-fig_3d$question[which(fig_3d$question=="investigators.not.welcome.in.communities")] <- "Investigators not welcome in communities"
-fig_3d$question[which(fig_3d$question=="other7")] <- "Other"
+  group_by(country, endemic_status, question) %>%
+  summarise(n=sum(response)) %>%
+  # Remove all zero response
+  filter(n > 0) %>%
+  # Make all country results equal
+  mutate(n = 1) %>%
+  # Recode result names
+  mutate(grouped_response = ifelse(question == "no.staff.available.1", "No staff available",
+                                   ifelse(question == "restrictions.on.staff.movement.1", "Restrictions on staff movements",
+                                          ifelse(question == "no.sample.collection.testing.kit.available", "No sample collection/testing kits available",
+                                                 ifelse(question == "no.budget", "No budget",
+                                                        ifelse(question == "difficult.to.adhere.to.COVID.19.guidelines.1", "Difficult to adhere to COVID-19 guidelines",
+                                                               ifelse(question == "investigators.not.welcome.in.communities", "Investigators not welcome in communities",
+                                                                      ifelse(question == "other7", "Other", NA)))))))) %>%
+  group_by(endemic_status, grouped_response) %>%
+  summarise(n=sum(n))
 
 # Collect totals
 fig_3d_totals <- fig_3d %>%
-  group_by(question) %>%
+  group_by(grouped_response) %>%
   summarise(ord = sum(n)) %>%
   arrange(desc(ord))
 
 # Rearrange data based on totals
 fig_3d <- fig_3d %>%
-  arrange(factor(question, levels=fig_3d_totals$question))
+  arrange(factor(grouped_response, levels=fig_3d_totals$grouped_response))
 
 # Save output
 write.csv(fig_3d, "output/figure_3d.csv", row.names = FALSE)
@@ -340,17 +350,22 @@ write.csv(fig_3d, "output/figure_3d.csv", row.names = FALSE)
 fig_4a <- survey_data %>%
   dplyr::select(country, "endemic_status"=progress.in.rabies.control..1free.2in.progress.3endemic,
                 more.free.roaming.dogs, fewer.free.roaming.dogs, dogs.more.aggressive,
-                dogs.in.poorer.health, other5) %>%
-  gather(., question, response, more.free.roaming.dogs:other5) %>%
+                dogs.in.poorer.health) %>%
+  gather(., question, response, more.free.roaming.dogs:dogs.in.poorer.health) %>%
+  group_by(country, endemic_status, question) %>%
+  summarise(n=sum(response)) %>%
+  # Remove all zero response
+  filter(n > 0) %>%
+  # Make all country results equal
+  mutate(n = 1) %>%
   group_by(endemic_status, question) %>%
-  summarise(n=sum(response))
+  summarise(n=sum(n))
 
 # Recode question responses
 fig_4a$question[which(fig_4a$question=="more.free.roaming.dogs")] <- "More free-roaming dogs"
 fig_4a$question[which(fig_4a$question=="fewer.free.roaming.dogs")] <- "Fewer free-roaming dogs"
 fig_4a$question[which(fig_4a$question=="dogs.more.aggressive")] <- "Dogs more aggressive"
-fig_4a$question[which(fig_4a$question=="dogs.in.poorer.health")] <- "Dogs in poorer health/starving"
-fig_4a$question[which(fig_4a$question=="other5")] <- "Other"
+fig_4a$question[which(fig_4a$question=="dogs.in.poorer.health")] <- "Dogs in poorer health"
 
 # Collect totals
 fig_4a_totals <- fig_4a %>%
@@ -360,8 +375,7 @@ fig_4a_totals <- fig_4a %>%
 
 # Rearrange data based on totals
 fig_4a <- fig_4a %>%
-  arrange(factor(question, levels=fig_4a_totals$question)) %>%
-  filter(question != "Other")
+  arrange(factor(question, levels=fig_4a_totals$question))
 
 # Save output
 write.csv(fig_4a, "output/figure_4a.csv", row.names = FALSE)
@@ -375,10 +389,16 @@ fig_4b <- survey_data %>%
                 people.removed.killed.them, local.authority.removed.killed.them,
                 more.abandonment.due.to.fear.of.COVID.19,
                 more.abandonment.due.to.financial.constraints,
-                more.abandonment.due.to.other.reasons, other6) %>%
-  gather(., question, response, more.people.fed.them:other6) %>%
+                more.abandonment.due.to.other.reasons,) %>%
+  gather(., question, response, more.people.fed.them:more.abandonment.due.to.other.reasons) %>%
+  group_by(country, endemic_status, question) %>%
+  summarise(n=sum(response)) %>%
+  # Remove all zero response
+  filter(n > 0) %>%
+  # Make all country results equal
+  mutate(n = 1) %>%
   group_by(endemic_status, question) %>%
-  summarise(n=sum(response))
+  summarise(n=sum(n))
 
 # Recode question responses
 fig_4b$question[which(fig_4b$question=="more.people.fed.them")] <- "More people fed them"
@@ -388,7 +408,6 @@ fig_4b$question[which(fig_4b$question=="local.authority.removed.killed.them")] <
 fig_4b$question[which(fig_4b$question=="more.abandonment.due.to.fear.of.COVID.19")] <- "Abandonment due to fear of COVID-19"
 fig_4b$question[which(fig_4b$question=="more.abandonment.due.to.financial.constraints")] <- "Abandonment due to financial constraints"
 fig_4b$question[which(fig_4b$question=="more.abandonment.due.to.other.reasons")] <- "Abandonment due to other reasons"
-fig_4b$question[which(fig_4b$question=="other6")] <- "Other"
 
 # Collect totals
 fig_4b_totals <- fig_4b %>%
@@ -398,8 +417,7 @@ fig_4b_totals <- fig_4b %>%
 
 # Rearrange data based on totals
 fig_4b <- fig_4b %>%
-  arrange(factor(question, levels=fig_4b_totals$question)) %>%
-  filter(question != "Other")
+  arrange(factor(question, levels=fig_4b_totals$question))
 
 # Save output
 write.csv(fig_4b, "output/figure_4b.csv", row.names = FALSE)
@@ -411,10 +429,16 @@ fig_4c <- survey_data %>%
   dplyr::select(country, "endemic_status"=progress.in.rabies.control..1free.2in.progress.3endemic,
                 attacks.on.dogs, attacks.on.other.animals, attacks.on.humans,
                 animal.rabies.cases.deaths, human.exposures.deaths, human.cruelty,
-                care, other10) %>%
-  gather(., question, response, attacks.on.dogs:other10) %>%
+                care) %>%
+  gather(., question, response, attacks.on.dogs:care) %>%
+  group_by(country, endemic_status, question) %>%
+  summarise(n=sum(response)) %>%
+  # Remove all zero response
+  filter(n > 0) %>%
+  # Make all country results equal
+  mutate(n = 1) %>%
   group_by(endemic_status, question) %>%
-  summarise(n=sum(response))
+  summarise(n=sum(n))
 
 # Recode question responses
 fig_4c$question[which(fig_4c$question=="attacks.on.dogs")] <- "More attacks on dogs"
@@ -424,7 +448,6 @@ fig_4c$question[which(fig_4c$question=="animal.rabies.cases.deaths")] <- "More a
 fig_4c$question[which(fig_4c$question=="human.exposures.deaths")] <- "More human rabies exposures/deaths"
 fig_4c$question[which(fig_4c$question=="human.cruelty")] <- "More cases of human cruelty towards dogs"
 fig_4c$question[which(fig_4c$question=="care")] <- "More cases of human care towards dogs"
-fig_4c$question[which(fig_4c$question=="other10")] <- "Other"
 
 # Collect totals
 fig_4c_totals <- fig_4c %>%
@@ -434,8 +457,7 @@ fig_4c_totals <- fig_4c %>%
 
 # Rearrange data based on totals
 fig_4c <- fig_4c %>%
-  arrange(factor(question, levels=fig_4c_totals$question)) %>%
-  filter(question != "Other")
+  arrange(factor(question, levels=fig_4c_totals$question))
 
 # Save output
 write.csv(fig_4c, "output/figure_4c.csv", row.names = FALSE)

@@ -1,37 +1,20 @@
-"endemic_status","question","n"
-"Endemic","Vaccines out of stock due to 
-financial constraints/supply issues",28
-"In-progress","Vaccines out of stock due to 
-financial constraints/supply issues",3
-"Rabies-free","Vaccines out of stock due to 
-financial constraints/supply issues",0
-"Endemic","Staff reduced due to quarantine/illness",17
-"In-progress","Staff reduced due to quarantine/illness",5
+"endemic_status","grouped_response","n"
+"Endemic","No vaccines availabile",23
+"In-progress","No vaccines availabile",2
+"Endemic","Staff reduced due to quarantine/illness",9
+"In-progress","Staff reduced due to quarantine/illness",4
 "Rabies-free","Staff reduced due to quarantine/illness",1
-"Endemic","Clinics closed/converted",15
-"In-progress","Clinics closed/converted",5
+"Endemic","Clinics closed/converted",9
+"In-progress","Clinics closed/converted",3
 "Rabies-free","Clinics closed/converted",1
-"Endemic","Staff redeployed",11
-"In-progress","Staff redeployed",5
+"Endemic","Staff redeployed",8
+"In-progress","Staff redeployed",4
 "Rabies-free","Staff redeployed",1
-"Endemic","Vaccines avaialable only/mostly 
-in the private sector",15
-"In-progress","Vaccines avaialable only/mostly 
+"Endemic","Vaccines avaailable only/mostly 
+in the private sector",11
+"In-progress","Vaccines avaailable only/mostly 
 in the private sector",1
-"Rabies-free","Vaccines avaialable only/mostly 
-in the private sector",0
-"Endemic","Follow up vaccines delayed/cancelled",8
-"In-progress","Follow up vaccines delayed/cancelled",3
-"Rabies-free","Follow up vaccines delayed/cancelled",0
-"Endemic","RIG not available",9
-"In-progress","RIG not available",2
-"Rabies-free","RIG not available",0
-"Endemic","Consumables not available",5
-"In-progress","Consumables not available",0
-"Rabies-free","Consumables not available",0
-"Endemic","Staff less likely to recommend PEP",4
-"In-progress","Staff less likely to recommend PEP",1
-"Rabies-free","Staff less likely to recommend PEP",0
-"Endemic","Staff less diligant due to stress",4
-"In-progress","Staff less diligant due to stress",0
-"Rabies-free","Staff less diligant due to stress",0
+"Endemic","Follow up vaccines delayed/cancelled",7
+"In-progress","Follow up vaccines delayed/cancelled",2
+"Endemic","Staff less diligant due to stress/vaccine shortage",6
+"In-progress","Staff less diligant due to stress/vaccine shortage",1
