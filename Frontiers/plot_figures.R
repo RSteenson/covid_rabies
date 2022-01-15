@@ -23,10 +23,25 @@ fig_4a <- read.csv("output/figure_4a.csv", stringsAsFactors = FALSE)
 fig_4b <- read.csv("output/figure_4b.csv", stringsAsFactors = FALSE)
 fig_4c <- read.csv("output/figure_4c.csv", stringsAsFactors = FALSE)
 
+#######################################################################
+# Fix names:
+fig_1b$work_sector <- gsub("National policy making/government", "National government", fig_1b$work_sector)
+fig_1b$work_sector <- gsub("Vaccine industry/logistics", "Industry", fig_1b$work_sector)
+# CONFIRM LOCAL GOVT (only in rabies-free settings - are they really not AH or PH or Lab?)?
+# CONFIRM programme management (only in endemic/ in-progress settings - are they really not AH or PH or Lab?)?
+# Regional organization (if this is PAHO or a subbranch of WHO I would, like for Asia pacific, I'd def put at Int. Organization)
+# What is other - can it really not be categorized?
+#
+# Note that the diamonds to highlight countries is now lost too!
+# CAN THE COLOUR PALATE USE "Free" NOT "Rabies-free"
+
+#######################################################################
+
 # Load shapefile
 world_shp <- read_sf("data/WHO Map boundaries/MapTemplate_detailed_2013/Shapefiles/detailed_2013.shp")
 
 # Set colour palettes
+
 col_pal <- c("Endemic"="#f44336", "In-progress"="#f28b30", "Rabies-free"="#03658c")
 
 #----- Produce figure 1 --------------------------------------------------------
@@ -53,13 +68,13 @@ fig_1a_plot = ggplot() +
   geom_sf(data=world_shp, fill="grey75", lwd=0.04, color="white") +
   # geom_sf(data=world_shp, fill="white") +
   geom_sf(data=world_shp_data, aes(fill=endemic_status), color="white", lwd=0.04, alpha=0.8) +
-  scale_fill_manual(name="Status of countries \nwith survey responses   ", values = col_pal, labels=c("Endemic   ", "In-progress   ", "Rabies-free")) +
+  scale_fill_manual(name="Dog-mediated rabies:", values = col_pal, labels=c("Endemic   ", "In-progress   ", "Free")) +
   # scale_color_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
   geom_sf(data=country_centroids, fill="black", shape=1, size=2.5, stroke=0.8) +
   coord_sf() +
   theme_void() +
-  theme(legend.position = "top", legend.title = element_text(size=12),
-        legend.text = element_text(size=11))
+  theme(legend.position = "top", legend.title = element_text(size=10),
+        legend.text = element_text(size=10))
 fig_1a_plot
 
 #----- Process data for barplot
@@ -74,12 +89,12 @@ fig_1b_plot = ggplot(data=fig_1b, aes(x=work_sector, y=n, fill=endemic_status)) 
   labs(x="Work Sector", y="Number of respondents") +
   scale_x_discrete(limits=rev) +
   coord_flip() +
-  theme_classic()
+  theme_classic() + theme(legend.position = "none")
 fig_1b_plot
 
 # Combine plots and save output
-ggarrange(fig_1a_plot, fig_1b_plot, ncol=1, heights=c(2,1), labels=c("A", "B"), common.legend = TRUE)
-ggsave("figs/Figure_1.pdf", height=7, width=10)
+ggarrange(fig_1a_plot, fig_1b_plot, ncol=1, heights=c(1.5,1), labels=c("A", "B"), common.legend = TRUE)
+ggsave("figs/Figure_1.pdf", height=14, width=18, units = "cm")
 
 #----- Produce figure 2 --------------------------------------------------------
 
@@ -87,32 +102,40 @@ ggsave("figs/Figure_1.pdf", height=7, width=10)
 
 fig_2a_plot = ggplot(data=fig_2a, aes(x=result, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8)+
-  scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Impact on mass dog vaccination", x="Extent of disruption", y="Number of respondents\n") +
+  scale_fill_manual(name="Dog-mediated \n rabies status:", 
+                    values = col_pal, guide=guide_legend(order=1)) +
+  labs(title="Dog vaccination", x="", y="") +
   scale_y_continuous(limits=c(0,40)) +
   theme_classic() +
-  theme(axis.title.x = element_blank())
+  theme(axis.title.x = element_blank(), legend.title = element_text(size=6),
+        legend.text = element_text(size=6), axis.title=element_text(size=7),
+        title = element_text(size = 7), axis.text = element_text(size=6))
 fig_2a_plot
 
 #----- Produce panel 2b
 
 fig_2b_plot = ggplot(data=fig_2b, aes(x=result, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8) +
-  scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Impact on access to post-exposure prophylaxis", x="Extent of disruption", y="Number of respondents\n") +
+  scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
+  labs(title="Post-exposure prophylaxis", x="", y="Respondents") +
   scale_y_continuous(limits=c(0,40)) +
   theme_classic() +
-  theme(axis.title.x = element_blank())
+  theme(axis.title.x = element_blank(), legend.title = element_text(size=6),
+        legend.text = element_text(size=6), axis.title=element_text(size=7),
+        title = element_text(size = 7), axis.text = element_text(size=6))
 fig_2b_plot
 
 #----- Produce panel 2c
 
 fig_2c_plot = ggplot(data=fig_2c, aes(x=result, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8) +
-  scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Impact on children's awareness activities", x="Extent of disruption", y="Number of respondents\n") +
+  scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
+  labs(title="Awareness activities", x="", y="") +
   scale_y_continuous(limits=c(0,40)) +
-  theme_classic()
+  theme_classic() +
+  theme(axis.title.x = element_blank(), legend.title = element_text(size=6),
+        legend.text = element_text(size=6), axis.title=element_text(size=7),
+        title = element_text(size = 7), axis.text = element_text(size=6))
 fig_2c_plot
 
 #----- Combine and save
@@ -120,7 +143,7 @@ fig_2c_plot
 # Combine plots and save output
 ggarrange(fig_2a_plot, fig_2b_plot, fig_2c_plot, ncol=1, common.legend = TRUE,
           labels=c("A", "B", "C"))
-ggsave("figs/Figure_2.pdf", height=10, width=10)
+ggsave("figs/Figure_2.pdf", height=16, width=8, units="cm")
 
 #----- Produce figure 3 --------------------------------------------------------
 
@@ -133,58 +156,71 @@ fig_3d$grouped_response <- factor(fig_3d$grouped_response, levels=unique(fig_3d$
 
 #----- Produce panel 3a
 
+# Change y-text to:
+##### "movement restrictions" "COVID-19 safety" "No/ limited vaccines" "Fears" "Staff shortages" "Increased costs" "Lacking consumables"
+
 fig_3a_plot = ggplot(data=fig_3a, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8, width=0.9)+
-  scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Reasons for disruption to mass dog vaccination", y="Number of countries\n") +
+  scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
+  labs(title="Dog vaccination", y="Number of countries\n") +
   scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
   theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
-        plot.title.position = "plot", plot.title = element_text(hjust=0.1))
+        plot.title.position = "plot", plot.title = element_text(hjust=0.1, size = 10))
 fig_3a_plot
 
 #----- Produce panel 3b
 
+# Change y-text to:
+##### "Fears" "Delayed" "No public transport" "Cost" "Interrupted schedule" "used local healers/ remedies" "telemedicine"
+
 fig_3b_plot = ggplot(data=fig_3b, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8)+
-  scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Reasons for disruption to access to post-exposure prophylaxis", y="Number of countries\n") +
+  scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
+  labs(title="Health seeking", y="Number of countries\n") +
   scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
   theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
-        plot.title.position = "plot", plot.title = element_text(hjust=0.15))
+        plot.title.position = "plot", plot.title = element_text(hjust=0.1, size = 10))
+#         plot.title.position = "plot", plot.title = element_text(hjust=0.15))
 fig_3b_plot
 
 #----- Produce panel 3c
+# Change y-text to:
+##### "Vaccine shortages" "Staff absences" "Clinics closed" "Staff redeployment" 
+##### "Vaccines only in private sector" "Follow up visits delayed/ cancelled" "Staff stress"
 
 fig_3c_plot = ggplot(data=fig_3c, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8)+
-  scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Reasons for disruption to delivery of post-exposure prophyaxis", y="Number of countries\n") +
+  scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
+  labs(title="Post-exposure prophylaxis", y="Number of countries\n") +
   scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
   theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
-        plot.title.position = "plot", plot.title = element_text(hjust=0.15))
+        plot.title.position = "plot", plot.title = element_text(hjust=0.1, size = 10))
+#        plot.title.position = "plot", plot.title = element_text(hjust=0.15))
 fig_3c_plot
 
 #----- Produce panel 3d
+# Change y-text to:
+##### "movement restrictions" "Staff shortages" "No budget" "COVID-19 safety" "No consumables/ equipment" "Investigators not welcome" "Other"
 
 fig_3d_plot = ggplot(data=fig_3d, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8)+
-  scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Reasons for disruption to surveillance", y="Number of countries\n") +
+  scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
+  labs(title="Surveillance", y="Number of countries\n") +
   scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
   theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
-        plot.title.position = "plot", plot.title = element_text(hjust=0.1))
+        plot.title.position = "plot", plot.title = element_text(hjust=0.1, size = 10))
 fig_3d_plot
 
 #----- Combine and save
@@ -193,7 +229,7 @@ fig_3d_plot
 ggarrange(fig_3a_plot, fig_3b_plot, fig_3c_plot, fig_3d_plot,
           ncol=2, nrow=2, common.legend = TRUE,
           labels=c("A", "B", "C", "D"), align="hv")
-ggsave("figs/Figure_3.pdf", height=10, width=15)
+ggsave("figs/Figure_3.pdf", height=12, width=18, units = "cm")
 
 #----- Figure 4 ----------------------------------------------------------------
 
@@ -203,51 +239,71 @@ fig_4a$question <- factor(fig_4a$question, levels=unique(fig_4a$question))
 fig_4b$question <- factor(fig_4b$question, levels=unique(fig_4b$question))
 fig_4c$question <- factor(fig_4c$question, levels=unique(fig_4c$question))
 
-#----- Produce panel 4a
+### CANNOT SEE x-Axis (countries) AND DO NOT NEED y-Axis (question)!
 
+#----- Produce panel 4a
+# Change y-text to:
+##### "More dogs" "Poorer health" "Fewer dogs" "More aggression"
 fig_4a_plot = ggplot(data=fig_4a, aes(x=question, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8, width=0.9)+
-  scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Changes in free-roaming dog populations and behaviour", y="Number of countries\n") +
+  scale_fill_manual(name="Dog-mediated \nrabies status:", values = col_pal, guide=guide_legend(order=1)) +
+  labs(title="Free-roaming dogs", y="Countries\n") +
   scale_y_continuous(limits=c(0,35)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
-  theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
-        plot.title.position = "plot", plot.title = element_text(hjust=0.1))
+  # theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
+  #       plot.title.position = "plot", plot.title = element_text(hjust=0.1))
+theme(axis.title.x = element_blank(), 
+      legend.title = element_text(size=6),
+      legend.text = element_text(size=6), axis.title=element_text(size=7),
+      title = element_text(size = 7), axis.text = element_text(size=6))
 fig_4a_plot
 
 #----- Produce panel 4b
+# Change y-text to:
+##### "Complaints/ requests" "Abandonment (cost)" "Abandonment (fear)" "More feeding" "Abandonment (other)" "Officials removed/ killed dogs" "Communities removed/ killed dogs"
 
 fig_4b_plot = ggplot(data=fig_4b, aes(x=question, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8, width=0.9)+
-  scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Changes in human-dog interactions", y="Number of countries\n") +
+  scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
+  labs(title="Human-dog interactions", y="Countries\n") +
   scale_y_continuous(limits=c(0,35)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
-  theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
-        plot.title.position = "plot", plot.title = element_text(hjust=0.08))
+  # theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
+  #       plot.title.position = "plot", plot.title = element_text(hjust=0.08))
+  theme(axis.title.x = element_blank(), 
+      legend.title = element_text(size=6),
+      legend.text = element_text(size=6), axis.title=element_text(size=7),
+      title = element_text(size = 7), axis.text = element_text(size=6))
 fig_4b_plot
 
 #----- Produce panel 4c
+# Change y-text to:
+##### "More cruelty" "More attacks on people" "More animal rabies" "More attacks on livestock" "More care" "More attacks on dogs" "More humans exposures/deaths" 
 
 fig_4c_plot = ggplot(data=fig_4c, aes(x=question, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8, width=0.9)+
-  scale_fill_manual(name="Status of countries \nwith survey responses", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Changes in media reporting of dogs", y="Number of countries\n") +
+  scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
+  labs(title="Media reporting of dogs", y="Countries\n") +
   scale_y_continuous(limits=c(0,35)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
-  theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
-        plot.title.position = "plot", plot.title = element_text(hjust=0.08))
+  # theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
+  #       plot.title.position = "plot", plot.title = element_text(hjust=0.08))
+  theme(axis.title.x = element_blank(), 
+        legend.title = element_text(size=6),
+        legend.text = element_text(size=6), axis.title=element_text(size=7),
+        title = element_text(size = 7), axis.text = element_text(size=6))
 fig_4c_plot
 
 #----- Combine and save
 
 # Combine plots and save output
 ggarrange(fig_4a_plot, fig_4b_plot, fig_4c_plot, ncol=1, common.legend = TRUE,
-          labels=c("A", "B", "C"), align="v")
-ggsave("figs/Figure_4.pdf", height=12, width=8)
+          labels=c("A", "B", "C"), align="v", heights=c(0.7,1,1))
+ggsave("figs/Figure_4.pdf", height=12, width=8, units="cm")
+
