@@ -320,7 +320,7 @@ fig_3d <- survey_data %>%
   mutate(n = 1) %>%
   # Recode result names
   mutate(grouped_response = ifelse(question == "no.staff.available.1", "Staff shortages", # "No staff available",
-                                   ifelse(question == "restrictions.on.staff.movement.1", "movement restrictions", # "Restrictions on staff movements",
+                                   ifelse(question == "restrictions.on.staff.movement.1", "Movement restrictions", # "Restrictions on staff movements",
                                           ifelse(question == "no.sample.collection.testing.kit.available", "No consumables/equipment", # "No sample collection/testing kits available",
                                                  ifelse(question == "no.budget", "No budget", # "No budget",
                                                         ifelse(question == "difficult.to.adhere.to.COVID.19.guidelines.1", "COVID-19 safety", # "Difficult to adhere to COVID-19 guidelines",
@@ -403,7 +403,7 @@ fig_4b <- survey_data %>%
 # Recode question responses
 fig_4b$question[which(fig_4b$question=="more.people.fed.them")] <- "More feeding" # "More people fed them"
 fig_4b$question[which(fig_4b$question=="people.complained.asked.for.solutions")] <- "Complaints/requests" # "People complained/asked for solutions"
-fig_4b$question[which(fig_4b$question=="people.removed.killed.them")] <- "Communities removed/ killed dogs" # "People removed/killed them"
+fig_4b$question[which(fig_4b$question=="people.removed.killed.them")] <- "Communities removed/killed dogs" # "People removed/killed them"
 fig_4b$question[which(fig_4b$question=="local.authority.removed.killed.them")] <- "Officials removed/killed dogs" # "Official workers removed/killed them"
 fig_4b$question[which(fig_4b$question=="more.abandonment.due.to.fear.of.COVID.19")] <- "Abandonment (fear)" # "Abandonment due to fear of COVID-19"
 fig_4b$question[which(fig_4b$question=="more.abandonment.due.to.financial.constraints")] <- "Abandonment (cost)" # "Abandonment due to financial constraints"
@@ -445,7 +445,7 @@ fig_4c$question[which(fig_4c$question=="attacks.on.dogs")] <- "More attacks on d
 fig_4c$question[which(fig_4c$question=="attacks.on.other.animals")] <- "More attacks on livestock" # "More attacks on other animals"
 fig_4c$question[which(fig_4c$question=="attacks.on.humans")] <- "More attacks on people" # "More attacks on humans"
 fig_4c$question[which(fig_4c$question=="animal.rabies.cases.deaths")] <- "More animal rabies" # "More animal rabies cases"
-fig_4c$question[which(fig_4c$question=="human.exposures.deaths")] <- "More humans exposures/deaths" # "More human rabies exposures/deaths"
+fig_4c$question[which(fig_4c$question=="human.exposures.deaths")] <- "More human exposures/deaths" # "More human rabies exposures/deaths"
 fig_4c$question[which(fig_4c$question=="human.cruelty")] <- "More cruelty" # "More cases of human cruelty towards dogs"
 fig_4c$question[which(fig_4c$question=="care")] <- "More care" # "More cases of human care towards dogs"
 
