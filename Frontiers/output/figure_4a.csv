@@ -1,10 +1,10 @@
 "endemic_status","question","n"
-"Endemic","More free-roaming dogs",18
-"In-progress","More free-roaming dogs",4
-"Rabies-free","More free-roaming dogs",1
-"Endemic","Dogs in poorer health",18
-"In-progress","Dogs in poorer health",3
-"Endemic","Fewer free-roaming dogs",8
-"In-progress","Fewer free-roaming dogs",4
-"Endemic","Dogs more aggressive",10
-"In-progress","Dogs more aggressive",1
+"Endemic","More dogs",18
+"Free","More dogs",1
+"In-progress","More dogs",4
+"Endemic","Poorer health",18
+"In-progress","Poorer health",3
+"Endemic","Fewer dogs",8
+"In-progress","Fewer dogs",4
+"Endemic","More aggression",10
+"In-progress","More aggression",1

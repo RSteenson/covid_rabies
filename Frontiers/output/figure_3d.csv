@@ -1,18 +1,18 @@
 "endemic_status","grouped_response","n"
-"Endemic","Restrictions on staff movements",18
-"In-progress","Restrictions on staff movements",5
-"Rabies-free","Restrictions on staff movements",2
-"Endemic","No staff available",17
-"In-progress","No staff available",4
-"Rabies-free","No staff available",1
+"Endemic","movement restrictions",18
+"Free","movement restrictions",2
+"In-progress","movement restrictions",5
+"Endemic","Staff shortages",17
+"Free","Staff shortages",1
+"In-progress","Staff shortages",4
 "Endemic","No budget",17
 "In-progress","No budget",2
-"Endemic","Difficult to adhere to COVID-19 guidelines",11
-"In-progress","Difficult to adhere to COVID-19 guidelines",5
-"Endemic","No sample collection/testing kits available",12
-"In-progress","No sample collection/testing kits available",3
-"Rabies-free","No sample collection/testing kits available",1
-"Endemic","Investigators not welcome in communities",6
-"In-progress","Investigators not welcome in communities",1
+"Endemic","COVID-19 safety",11
+"In-progress","COVID-19 safety",5
+"Endemic","No consumables/equipment",12
+"Free","No consumables/equipment",1
+"In-progress","No consumables/equipment",3
+"Endemic","Investigators not welcome",6
+"In-progress","Investigators not welcome",1
 "Endemic","Other",4
 "In-progress","Other",1

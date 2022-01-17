@@ -1,20 +1,18 @@
 "endemic_status","grouped_response","n"
-"Endemic","No vaccines availabile",23
-"In-progress","No vaccines availabile",2
-"Endemic","Staff reduced due to quarantine/illness",9
-"In-progress","Staff reduced due to quarantine/illness",4
-"Rabies-free","Staff reduced due to quarantine/illness",1
-"Endemic","Clinics closed/converted",9
-"In-progress","Clinics closed/converted",3
-"Rabies-free","Clinics closed/converted",1
-"Endemic","Staff redeployed",8
-"In-progress","Staff redeployed",4
-"Rabies-free","Staff redeployed",1
-"Endemic","Vaccines avaailable only/mostly 
-in the private sector",11
-"In-progress","Vaccines avaailable only/mostly 
-in the private sector",1
-"Endemic","Follow up vaccines delayed/cancelled",7
-"In-progress","Follow up vaccines delayed/cancelled",2
-"Endemic","Staff less diligant due to stress/vaccine shortage",6
-"In-progress","Staff less diligant due to stress/vaccine shortage",1
+"Endemic","Vaccine shortages",23
+"In-progress","Vaccine shortages",2
+"Endemic","Staff absences",9
+"Free","Staff absences",1
+"In-progress","Staff absences",4
+"Endemic","Clinics closed",9
+"Free","Clinics closed",1
+"In-progress","Clinics closed",3
+"Endemic","Staff redeployment",8
+"Free","Staff redeployment",1
+"In-progress","Staff redeployment",4
+"Endemic","Vaccines only in private sector",11
+"In-progress","Vaccines only in private sector",1
+"Endemic","Follow up visits delayed/cancelled",7
+"In-progress","Follow up visits delayed/cancelled",2
+"Endemic","Staff stress",6
+"In-progress","Staff stress",1

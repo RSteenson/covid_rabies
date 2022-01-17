@@ -1,13 +1,13 @@
 "endemic_status","grouped_response","n"
-"Endemic","People feared COVID-19 in clinics",18
-"In-progress","People feared COVID-19 in clinics",4
-"Endemic","People delayed going to clinics",15
-"In-progress","People delayed going to clinics",4
-"Endemic","People could not use public transportation",12
-"In-progress","People could not use public transportation",2
-"Endemic","People could not afford travel",10
-"In-progress","People could not afford travel",2
-"Endemic","People interrupted the vaccination schedule",12
-"Endemic","People relied on local remedies/healers",6
-"Endemic","People used toll-free numbers/telemedicine",1
-"In-progress","People used toll-free numbers/telemedicine",1
+"Endemic","Fears",18
+"In-progress","Fears",4
+"Endemic","Delayed",15
+"In-progress","Delayed",4
+"Endemic","No public transport",12
+"In-progress","No public transport",2
+"Endemic","Cost",10
+"In-progress","Cost",2
+"Endemic","Interrupted schedule",12
+"Endemic","Used local healers/remedies",6
+"Endemic","Telemedicine",1
+"In-progress","Telemedicine",1

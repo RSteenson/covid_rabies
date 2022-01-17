@@ -1,16 +1,16 @@
 "endemic_status","question","n"
-"Endemic","People complained/asked for solutions",20
-"In-progress","People complained/asked for solutions",3
-"Rabies-free","People complained/asked for solutions",1
-"Endemic","Abandonment due to financial constraints",17
-"In-progress","Abandonment due to financial constraints",2
-"Rabies-free","Abandonment due to financial constraints",1
-"Endemic","Abandonment due to fear of COVID-19",14
-"In-progress","Abandonment due to fear of COVID-19",2
-"Rabies-free","Abandonment due to fear of COVID-19",1
-"Endemic","More people fed them",8
-"In-progress","More people fed them",2
-"Endemic","Abandonment due to other reasons",1
-"In-progress","Abandonment due to other reasons",3
-"Endemic","Official workers removed/killed them",4
-"Endemic","People removed/killed them",4
+"Endemic","Complaints/requests",20
+"Free","Complaints/requests",1
+"In-progress","Complaints/requests",3
+"Endemic","Abandonment (cost)",17
+"Free","Abandonment (cost)",1
+"In-progress","Abandonment (cost)",2
+"Endemic","Abandonment (fear)",14
+"Free","Abandonment (fear)",1
+"In-progress","Abandonment (fear)",2
+"Endemic","More feeding",8
+"In-progress","More feeding",2
+"Endemic","Abandonment (other)",1
+"In-progress","Abandonment (other)",3
+"Endemic","Communities removed/ killed dogs",4
+"Endemic","Officials removed/killed dogs",4
