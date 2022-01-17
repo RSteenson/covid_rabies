@@ -10,7 +10,7 @@ library(tidyr)
 source("R/recode_countries.R")
 
 # Load spreadsheet
-survey_data <- read.csv("data/Frontiers_data_V3.csv", stringsAsFactors = FALSE)
+survey_data <- read.csv("data/Frontiers_data_V4.csv", stringsAsFactors = FALSE)
 
 # Trim whitespace on country names
 survey_data$country <- trimws(survey_data$country, which="right")
@@ -19,7 +19,7 @@ survey_data$country <- trimws(survey_data$country, which="right")
 survey_data <- recode_countries(survey_data, "country")
 
 # Recode endemic status
-survey_data$progress.in.rabies.control..1free.2in.progress.3endemic <- ifelse(survey_data$progress.in.rabies.control..1free.2in.progress.3endemic==1, "Rabies-free",
+survey_data$progress.in.rabies.control..1free.2in.progress.3endemic <- ifelse(survey_data$progress.in.rabies.control..1free.2in.progress.3endemic==1, "Free",
                                                                               ifelse(survey_data$progress.in.rabies.control..1free.2in.progress.3endemic==2, "In-progress", "Endemic"))
 
 #----- Figure 1 ----------------------------------------------------------------
@@ -52,7 +52,7 @@ write.csv(fig_1a, "output/figure_1a.csv", row.names = FALSE)
 
 # Subset data
 fig_1b <- survey_data %>%
-  dplyr::select("endemic_status"=progress.in.rabies.control..1free.2in.progress.3endemic, "work_sector"=work.sector) %>%
+  dplyr::select("endemic_status"=progress.in.rabies.control..1free.2in.progress.3endemic, "work_sector"=NEW.WORK.SECTOR) %>%
   group_by(work_sector, endemic_status) %>%
   summarise(n = n())
 
@@ -194,13 +194,13 @@ fig_3a <- survey_data %>%
   # Make all country results equal
   mutate(n = 1) %>%
   # Recode result names
-  mutate(grouped_response = ifelse(question == "restrictions.on.staff.movement", "Restrictions on staff movement",
-                                   ifelse(question == "difficult.to.adhere.to.COVID.19.guidelines", "Difficult to adhere to COVID-19 guidelines",
-                                          ifelse(question == "people.afraid.of.leaving.home.gathering", "People afraid of leaving home/gathering",
-                                                 ifelse(question == "no.vaccines.available", "No/limited vaccines available",
-                                                        ifelse(question == "no.staff.available", "No staff available",
-                                                               ifelse(question == "increased.cost.of.organizing", "Increased cost of organizing",
-                                                                      ifelse(question == "no.consumables.available", "No consumables available", NA)))))))) %>%
+  mutate(grouped_response = ifelse(question == "restrictions.on.staff.movement", "Movement restrictions", # "Restrictions on staff movement",
+                                   ifelse(question == "difficult.to.adhere.to.COVID.19.guidelines", "COVID-19 safety", # "Difficult to adhere to COVID-19 guidelines",
+                                          ifelse(question == "people.afraid.of.leaving.home.gathering", "Fears", # "People afraid of leaving home/gathering",
+                                                 ifelse(question == "no.vaccines.available", "No/limited vaccines", # "No/limited vaccines available",
+                                                        ifelse(question == "no.staff.available", "Staff shortages", # "No staff available",
+                                                               ifelse(question == "increased.cost.of.organizing", "Increased costs", # "Increased cost of organizing",
+                                                                      ifelse(question == "no.consumables.available", "Lacking consumables", NA)))))))) %>% # "No consumables available",
   group_by(endemic_status, grouped_response) %>%
   summarise(n=sum(n))
 
@@ -234,13 +234,13 @@ fig_3b <- survey_data %>%
   # Make all country results equal
   mutate(n = 1) %>%
   # Recode result names
-  mutate(grouped_response = ifelse(question == "people.have.avoided.clinics.due.to.fear.of.COVID.19", "People feared COVID-19 in clinics",
-                                 ifelse(question == "people.cannot.afford.travel", "People could not afford travel",
-                                        ifelse(question == "people.cannot.reach.clinics.because.of.reduced.public.transport", "People could not use public transportation",
-                                               ifelse(question == "people.have.delayed.going.to.clinics", "People delayed going to clinics",
-                                                      ifelse(question == "people.have.relied.more.on.local.remedies", "People relied on local remedies/healers",
-                                                             ifelse(question == "people.have.used.toll.free.numbers.telemedicine", "People used toll-free numbers/telemedicine",
-                                                                    ifelse(question == "people.have.interrupted.PEP", "People interrupted the vaccination schedule", NA)))))))) %>%
+  mutate(grouped_response = ifelse(question == "people.have.avoided.clinics.due.to.fear.of.COVID.19", "Fears", # "People feared COVID-19 in clinics",
+                                 ifelse(question == "people.cannot.afford.travel", "Cost", # "People could not afford travel",
+                                        ifelse(question == "people.cannot.reach.clinics.because.of.reduced.public.transport", "No public transport", # "People could not use public transportation",
+                                               ifelse(question == "people.have.delayed.going.to.clinics", "Delayed", # "People delayed going to clinics",
+                                                      ifelse(question == "people.have.relied.more.on.local.remedies", "Used local healers/remedies", # "People relied on local remedies/healers",
+                                                             ifelse(question == "people.have.used.toll.free.numbers.telemedicine", "Telemedicine", # "People used toll-free numbers/telemedicine",
+                                                                    ifelse(question == "people.have.interrupted.PEP", "Interrupted schedule", NA)))))))) %>% # "People interrupted the vaccination schedule",
   group_by(endemic_status, grouped_response) %>%
   summarise(n=sum(n))
 
@@ -279,13 +279,13 @@ fig_3c <- survey_data %>%
   # Make all country results equal
   mutate(n = 1) %>%
   # Recode result names
-  mutate(grouped_response = ifelse(question == "some.many.clinics.closed.converted", "Clinics closed/converted",
-                                   ifelse(question == "staff.redeployed", "Staff redeployed",
-                                          ifelse(question == "staff.reduced.due.to.quarantine.illness", "Staff reduced due to quarantine/illness",
-                                                 ifelse(question == "staff.less.diligent", "Staff less diligant due to stress/vaccine shortage",
-                                                        ifelse(question == "follow.up.shots.delayed.cancelled", "Follow up vaccines delayed/cancelled",
-                                                               ifelse(question == "vaccines.out.of.stock", "No vaccines availabile",
-                                                                      ifelse(question == "vaccines.available.only.in.the.private.sector", "Vaccines avaailable only/mostly \nin the private sector", NA)))))))) %>%
+  mutate(grouped_response = ifelse(question == "some.many.clinics.closed.converted", "Clinics closed", # "Clinics closed/converted",
+                                   ifelse(question == "staff.redeployed", "Staff redeployment", # "Staff redeployed",
+                                          ifelse(question == "staff.reduced.due.to.quarantine.illness", "Staff absences", # "Staff reduced due to quarantine/illness",
+                                                 ifelse(question == "staff.less.diligent", "Staff stress", # "Staff less diligant due to stress/vaccine shortage",
+                                                        ifelse(question == "follow.up.shots.delayed.cancelled", "Follow up visits delayed/cancelled", # "Follow up vaccines delayed/cancelled",
+                                                               ifelse(question == "vaccines.out.of.stock", "Vaccine shortages", # "No vaccines available",
+                                                                      ifelse(question == "vaccines.available.only.in.the.private.sector", "Vaccines only in private sector", NA)))))))) %>% # "Vaccines available only/mostly \nin the private sector",
   group_by(endemic_status, grouped_response) %>%
   summarise(n=sum(n))
 
@@ -319,12 +319,12 @@ fig_3d <- survey_data %>%
   # Make all country results equal
   mutate(n = 1) %>%
   # Recode result names
-  mutate(grouped_response = ifelse(question == "no.staff.available.1", "No staff available",
-                                   ifelse(question == "restrictions.on.staff.movement.1", "Restrictions on staff movements",
-                                          ifelse(question == "no.sample.collection.testing.kit.available", "No sample collection/testing kits available",
-                                                 ifelse(question == "no.budget", "No budget",
-                                                        ifelse(question == "difficult.to.adhere.to.COVID.19.guidelines.1", "Difficult to adhere to COVID-19 guidelines",
-                                                               ifelse(question == "investigators.not.welcome.in.communities", "Investigators not welcome in communities",
+  mutate(grouped_response = ifelse(question == "no.staff.available.1", "Staff shortages", # "No staff available",
+                                   ifelse(question == "restrictions.on.staff.movement.1", "movement restrictions", # "Restrictions on staff movements",
+                                          ifelse(question == "no.sample.collection.testing.kit.available", "No consumables/equipment", # "No sample collection/testing kits available",
+                                                 ifelse(question == "no.budget", "No budget", # "No budget",
+                                                        ifelse(question == "difficult.to.adhere.to.COVID.19.guidelines.1", "COVID-19 safety", # "Difficult to adhere to COVID-19 guidelines",
+                                                               ifelse(question == "investigators.not.welcome.in.communities", "Investigators not welcome", # "Investigators not welcome in communities",
                                                                       ifelse(question == "other7", "Other", NA)))))))) %>%
   group_by(endemic_status, grouped_response) %>%
   summarise(n=sum(n))
@@ -362,10 +362,10 @@ fig_4a <- survey_data %>%
   summarise(n=sum(n))
 
 # Recode question responses
-fig_4a$question[which(fig_4a$question=="more.free.roaming.dogs")] <- "More free-roaming dogs"
-fig_4a$question[which(fig_4a$question=="fewer.free.roaming.dogs")] <- "Fewer free-roaming dogs"
-fig_4a$question[which(fig_4a$question=="dogs.more.aggressive")] <- "Dogs more aggressive"
-fig_4a$question[which(fig_4a$question=="dogs.in.poorer.health")] <- "Dogs in poorer health"
+fig_4a$question[which(fig_4a$question=="more.free.roaming.dogs")] <- "More dogs" # "More free-roaming dogs"
+fig_4a$question[which(fig_4a$question=="fewer.free.roaming.dogs")] <- "Fewer dogs" # "Fewer free-roaming dogs"
+fig_4a$question[which(fig_4a$question=="dogs.more.aggressive")] <- "More aggression" # "Dogs more aggressive"
+fig_4a$question[which(fig_4a$question=="dogs.in.poorer.health")] <- "Poorer health" # "Dogs in poorer health"
 
 # Collect totals
 fig_4a_totals <- fig_4a %>%
@@ -401,13 +401,13 @@ fig_4b <- survey_data %>%
   summarise(n=sum(n))
 
 # Recode question responses
-fig_4b$question[which(fig_4b$question=="more.people.fed.them")] <- "More people fed them"
-fig_4b$question[which(fig_4b$question=="people.complained.asked.for.solutions")] <- "People complained/asked for solutions"
-fig_4b$question[which(fig_4b$question=="people.removed.killed.them")] <- "People removed/killed them"
-fig_4b$question[which(fig_4b$question=="local.authority.removed.killed.them")] <- "Official workers removed/killed them"
-fig_4b$question[which(fig_4b$question=="more.abandonment.due.to.fear.of.COVID.19")] <- "Abandonment due to fear of COVID-19"
-fig_4b$question[which(fig_4b$question=="more.abandonment.due.to.financial.constraints")] <- "Abandonment due to financial constraints"
-fig_4b$question[which(fig_4b$question=="more.abandonment.due.to.other.reasons")] <- "Abandonment due to other reasons"
+fig_4b$question[which(fig_4b$question=="more.people.fed.them")] <- "More feeding" # "More people fed them"
+fig_4b$question[which(fig_4b$question=="people.complained.asked.for.solutions")] <- "Complaints/requests" # "People complained/asked for solutions"
+fig_4b$question[which(fig_4b$question=="people.removed.killed.them")] <- "Communities removed/ killed dogs" # "People removed/killed them"
+fig_4b$question[which(fig_4b$question=="local.authority.removed.killed.them")] <- "Officials removed/killed dogs" # "Official workers removed/killed them"
+fig_4b$question[which(fig_4b$question=="more.abandonment.due.to.fear.of.COVID.19")] <- "Abandonment (fear)" # "Abandonment due to fear of COVID-19"
+fig_4b$question[which(fig_4b$question=="more.abandonment.due.to.financial.constraints")] <- "Abandonment (cost)" # "Abandonment due to financial constraints"
+fig_4b$question[which(fig_4b$question=="more.abandonment.due.to.other.reasons")] <- "Abandonment (other)" # "Abandonment due to other reasons"
 
 # Collect totals
 fig_4b_totals <- fig_4b %>%
@@ -441,13 +441,13 @@ fig_4c <- survey_data %>%
   summarise(n=sum(n))
 
 # Recode question responses
-fig_4c$question[which(fig_4c$question=="attacks.on.dogs")] <- "More attacks on dogs"
-fig_4c$question[which(fig_4c$question=="attacks.on.other.animals")] <- "More attacks on other animals"
-fig_4c$question[which(fig_4c$question=="attacks.on.humans")] <- "More attacks on humans"
-fig_4c$question[which(fig_4c$question=="animal.rabies.cases.deaths")] <- "More animal rabies cases"
-fig_4c$question[which(fig_4c$question=="human.exposures.deaths")] <- "More human rabies exposures/deaths"
-fig_4c$question[which(fig_4c$question=="human.cruelty")] <- "More cases of human cruelty towards dogs"
-fig_4c$question[which(fig_4c$question=="care")] <- "More cases of human care towards dogs"
+fig_4c$question[which(fig_4c$question=="attacks.on.dogs")] <- "More attacks on dogs" # "More attacks on dogs"
+fig_4c$question[which(fig_4c$question=="attacks.on.other.animals")] <- "More attacks on livestock" # "More attacks on other animals"
+fig_4c$question[which(fig_4c$question=="attacks.on.humans")] <- "More attacks on people" # "More attacks on humans"
+fig_4c$question[which(fig_4c$question=="animal.rabies.cases.deaths")] <- "More animal rabies" # "More animal rabies cases"
+fig_4c$question[which(fig_4c$question=="human.exposures.deaths")] <- "More humans exposures/deaths" # "More human rabies exposures/deaths"
+fig_4c$question[which(fig_4c$question=="human.cruelty")] <- "More cruelty" # "More cases of human cruelty towards dogs"
+fig_4c$question[which(fig_4c$question=="care")] <- "More care" # "More cases of human care towards dogs"
 
 # Collect totals
 fig_4c_totals <- fig_4c %>%
