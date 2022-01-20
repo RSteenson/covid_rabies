@@ -78,7 +78,6 @@ fig_1a_plot = ggplot() +
   theme_void() +
   theme(legend.position = "top", legend.title = element_text(size=10),
         legend.text = element_text(size=10))
-fig_1a_plot
 
 #----- Process data for barplot
 
@@ -97,8 +96,8 @@ fig_1b_plot = ggplot(data=fig_1b, aes(x=work_sector, y=n, fill=endemic_status)) 
   scale_x_discrete(limits=rev) +
   scale_y_continuous(limits=c(0,30)) +
   coord_flip() +
-  theme_classic() + theme(legend.position = "none")
-fig_1b_plot
+  theme_classic() +
+  theme(legend.position = "none", axis.text = element_text(size=10))
 
 # Combine plots and save output
 ggarrange(fig_1a_plot, fig_1b_plot, ncol=1, heights=c(1.5,1), labels=c("A", "B"), common.legend = TRUE)
@@ -125,7 +124,6 @@ fig_2a_plot = ggplot(data=fig_2a, aes(x=result, y=n, fill=endemic_status)) +
   theme(axis.title.x = element_blank(), legend.title = element_text(size=6),
         legend.text = element_text(size=6), axis.title=element_text(size=7),
         title = element_text(size = 7), axis.text = element_text(size=6))
-fig_2a_plot
 
 #----- Produce panel 2b
 
@@ -138,7 +136,6 @@ fig_2b_plot = ggplot(data=fig_2b, aes(x=result, y=n, fill=endemic_status)) +
   theme(axis.title.x = element_blank(), legend.title = element_text(size=6),
         legend.text = element_text(size=6), axis.title=element_text(size=7),
         title = element_text(size = 7), axis.text = element_text(size=6))
-fig_2b_plot
 
 #----- Produce panel 2c
 
@@ -151,7 +148,6 @@ fig_2c_plot = ggplot(data=fig_2c, aes(x=result, y=n, fill=endemic_status)) +
   theme(axis.title.x = element_blank(), legend.title = element_text(size=6),
         legend.text = element_text(size=6), axis.title=element_text(size=7),
         title = element_text(size = 7), axis.text = element_text(size=6))
-fig_2c_plot
 
 #----- Combine and save
 
@@ -181,40 +177,38 @@ fig_3d$endemic_status <- factor(fig_3d$endemic_status, levels=c("Endemic", "In-p
 fig_3a_plot = ggplot(data=fig_3a, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8, width=0.9)+
   scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Dog vaccination", y="Number of countries\n") +
+  labs(title="Dog vaccination", y="Countries\n") +
   scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
   theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
         plot.title.position = "plot", plot.title = element_text(hjust=0.1, size = 10))
-fig_3a_plot
 
 #----- Produce panel 3b
 
 fig_3b_plot = ggplot(data=fig_3b, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8)+
   scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Health seeking", y="Number of countries\n") +
+  labs(title="Health seeking", y="Countries\n") +
   scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
   theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
         plot.title.position = "plot", plot.title = element_text(hjust=0.1, size = 10))
-fig_3b_plot
 
 #----- Produce panel 3c
 
 fig_3c_plot = ggplot(data=fig_3c, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8)+
   scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Post-exposure prophylaxis", y="Number of countries\n") +
+  labs(title="Post-exposure prophylaxis", y="Countries\n") +
   scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
-  theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
+  theme(axis.title.y = element_blank(), axis.title.x = element_text(size=10),
         plot.title.position = "plot", plot.title = element_text(hjust=0.15, size = 10))
 
 #----- Produce panel 3d
@@ -222,14 +216,13 @@ fig_3c_plot = ggplot(data=fig_3c, aes(x=grouped_response, y=n, fill=endemic_stat
 fig_3d_plot = ggplot(data=fig_3d, aes(x=grouped_response, y=n, fill=endemic_status)) +
   geom_col(alpha=0.8)+
   scale_fill_manual(name="Dog-mediated rabies status:", values = col_pal, guide=guide_legend(order=1)) +
-  labs(title="Surveillance", y="Number of countries\n") +
+  labs(title="Surveillance", y="Countries\n") +
   scale_y_continuous(limits=c(0,30)) +
   theme_classic() +
   scale_x_discrete(limits=rev) +
   coord_flip() +
-  theme(axis.title.x = element_blank(), axis.title.y = element_blank(),
+  theme(axis.title.y = element_blank(), axis.title.x = element_text(size=10),
         plot.title.position = "plot", plot.title = element_text(hjust=0.1, size = 10))
-fig_3d_plot
 
 #----- Combine and save
 
@@ -268,7 +261,6 @@ fig_4a_plot = ggplot(data=fig_4a, aes(x=question, y=n, fill=endemic_status)) +
       legend.text = element_text(size=6), axis.title=element_text(size=7),
       title = element_text(size = 7), axis.text = element_text(size=6),
       plot.title.position = "plot", plot.title = element_text(hjust=0.1))
-fig_4a_plot
 
 #----- Produce panel 4b
 
@@ -285,7 +277,6 @@ fig_4b_plot = ggplot(data=fig_4b, aes(x=question, y=n, fill=endemic_status)) +
       legend.text = element_text(size=6), axis.title=element_text(size=7),
       title = element_text(size = 7), axis.text = element_text(size=6),
       plot.title.position = "plot", plot.title = element_text(hjust=0.1))
-fig_4b_plot
 
 #----- Produce panel 4c
 
@@ -302,7 +293,6 @@ fig_4c_plot = ggplot(data=fig_4c, aes(x=question, y=n, fill=endemic_status)) +
         legend.text = element_text(size=6), axis.title=element_text(size=7),
         title = element_text(size = 7), axis.text = element_text(size=6),
         plot.title.position = "plot", plot.title = element_text(hjust=0.1))
-fig_4c_plot
 
 #----- Combine and save
 
@@ -310,4 +300,3 @@ fig_4c_plot
 ggarrange(fig_4a_plot, fig_4b_plot, fig_4c_plot, ncol=1, common.legend = TRUE,
           labels=c("A", "B", "C"), align="v", heights=c(0.7,1,1))
 ggsave("figs/Figure_4.pdf", height=12, width=8, units="cm")
-

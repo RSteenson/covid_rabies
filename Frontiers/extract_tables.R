@@ -52,7 +52,7 @@ write.csv(fig_1a, "output/figure_1a.csv", row.names = FALSE)
 
 # Subset data
 fig_1b <- survey_data %>%
-  dplyr::select("endemic_status"=progress.in.rabies.control..1free.2in.progress.3endemic, "work_sector"=NEW.WORK.SECTOR) %>%
+  dplyr::select("endemic_status"=progress.in.rabies.control..1free.2in.progress.3endemic, "work_sector"=work.sector) %>%
   group_by(work_sector, endemic_status) %>%
   summarise(n = n())
 
